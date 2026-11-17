@@ -39,6 +39,11 @@ class _ReferenceImageViewerState extends ConsumerState<ReferenceImageViewer> {
               child: Transform(
                 alignment: Alignment.center,
                 transform: Matrix4.identity()
+                  // Apply canvas transformations first
+                  ..translate(drawingProvider.offsetX, drawingProvider.offsetY)
+                  ..scale(drawingProvider.scale, drawingProvider.scale)
+                  ..rotateZ(drawingProvider.rotation)
+                  // Apply reference image transformations
                   ..translate(currentImage.offsetX, currentImage.offsetY)
                   ..scale(
                       currentImage.scale *
