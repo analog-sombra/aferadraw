@@ -22,11 +22,71 @@ class _ReferenceImageViewerState extends ConsumerState<ReferenceImageViewer> {
     final drawingProvider = ref.watch(drawingNotifierProvider);
     final notifier = ref.read(drawingNotifierProvider.notifier);
     final currentImage = drawingProvider.currentRefImage;
+    final isDrawMode = drawingProvider.isRefImageDrawMode;
 
     if (currentImage == null) {
       return const SizedBox.shrink();
     }
 
+    // Draw Mode: On canvas for tracing (non-interactive overlay)
+    if (isDrawMode) {
+      return Stack(
+        children: [
+          // Reference image - NON-INTERACTIVE overlay
+          // Let canvas gestures pass through
+          Positioned.fill(
+            child: IgnorePointer(
+              child: Transform(
+                alignment: Alignment.center,
+                transform: Matrix4.identity()
+                  ..translate(currentImage.offsetX, currentImage.offsetY)
+                  ..scale(
+                      currentImage.scale *
+                          (currentImage.isFlipped ? -1 : 1),
+                      currentImage.scale)
+                  ..rotateZ(currentImage.rotation),
+                child: Opacity(
+                  opacity: currentImage.opacity,
+                  child: ColorFiltered(
+                    colorFilter: ui.ColorFilter.matrix(
+                      _getSaturationMatrix(currentImage.saturation),
+                    ),
+                    child: Image.file(
+                      File(currentImage.imagePath),
+                      fit: BoxFit.contain,
+                    ),
+                  ),
+                ),
+              ),
+            ),
+          ),
+          // Close button - only interactive element
+          Positioned(
+            top: 8,
+            right: 8,
+            child: Container(
+              decoration: BoxDecoration(
+                color: Colors.black87,
+                borderRadius: BorderRadius.circular(8),
+              ),
+              child: IconButton(
+                icon: const Icon(Icons.close),
+                color: Colors.white,
+                iconSize: 20,
+                visualDensity: VisualDensity.compact,
+                padding: EdgeInsets.zero,
+                constraints: const BoxConstraints(),
+                onPressed: () {
+                  notifier.toggleRefImageDrawMode();
+                },
+              ),
+            ),
+          ),
+        ],
+      );
+    }
+
+    // Normal Mode: Full-screen overlay with all controls
     return Positioned.fill(
       child: Container(
         color: Colors.black12,
@@ -93,13 +153,6 @@ class _ReferenceImageViewerState extends ConsumerState<ReferenceImageViewer> {
                                   fit: BoxFit.cover,
                                 ),
                               ),
-                              if (currentImage.showGrid)
-                                Positioned.fill(
-                                  child: CustomPaint(
-                                    painter: GridPainterOverlay(
-                                        currentImage.gridDivisions),
-                                  ),
-                                ),
                             ],
                           ),
                         ),
@@ -136,34 +189,6 @@ class _ReferenceImageViewerState extends ConsumerState<ReferenceImageViewer> {
                     ),
                     const SizedBox(width: 6),
                     IconButton(
-                      icon: const Icon(Icons.crop_free),
-                      color: currentImage.aspectRatioLocked
-                          ? Colors.orange
-                          : Colors.white,
-                      tooltip: 'Lock aspect ratio',
-                      iconSize: 18,
-                      visualDensity: VisualDensity.compact,
-                      padding: EdgeInsets.zero,
-                      constraints: const BoxConstraints(),
-                      onPressed: () {
-                        notifier.toggleAspectRatioLock();
-                      },
-                    ),
-                    const SizedBox(width: 6),
-                    IconButton(
-                      icon: const Icon(Icons.grid_on),
-                      color: currentImage.showGrid ? Colors.orange : Colors.white,
-                      tooltip: 'Grid overlay',
-                      iconSize: 18,
-                      visualDensity: VisualDensity.compact,
-                      padding: EdgeInsets.zero,
-                      constraints: const BoxConstraints(),
-                      onPressed: () {
-                        notifier.toggleGridOverlay();
-                      },
-                    ),
-                    const SizedBox(width: 6),
-                    IconButton(
                       icon: const Icon(Icons.fit_screen),
                       color: Colors.white,
                       visualDensity: VisualDensity.compact,
@@ -189,6 +214,19 @@ class _ReferenceImageViewerState extends ConsumerState<ReferenceImageViewer> {
                       },
                     ),
                     const Spacer(),
+                    IconButton(
+                      icon: const Icon(Icons.draw),
+                      color: Colors.greenAccent,
+                      tooltip: 'Enter draw mode',
+                      visualDensity: VisualDensity.compact,
+                      iconSize: 18,
+                      padding: EdgeInsets.zero,
+                      constraints: const BoxConstraints(),
+                      onPressed: () {
+                        notifier.toggleRefImageDrawMode();
+                      },
+                    ),
+                    const SizedBox(width: 6),
                     IconButton(
                       icon: const Icon(Icons.info_outline),
                       color: _showControls ? Colors.orange : Colors.white,
@@ -467,18 +505,16 @@ class _ReferenceImageViewerState extends ConsumerState<ReferenceImageViewer> {
   }
 
   List<double> _getSaturationMatrix(double saturation) {
-    // Matrix to adjust saturation
-    // saturation: 0 = grayscale, 1 = normal, 2 = double saturation
     final s = saturation;
     final sr = (1 - s) * 0.299;
     final sg = (1 - s) * 0.587;
     final sb = (1 - s) * 0.114;
 
     return [
-      sr + s, sg, sb, 0, 0, // Red row
-      sr, sg + s, sb, 0, 0, // Green row
-      sr, sg, sb + s, 0, 0, // Blue row
-      0, 0, 0, 1, 0, // Alpha row
+      sr + s, sg, sb, 0, 0,
+      sr, sg + s, sb, 0, 0,
+      sr, sg, sb + s, 0, 0,
+      0, 0, 0, 1, 0,
     ];
   }
 }
@@ -497,7 +533,6 @@ class GridPainterOverlay extends CustomPainter {
     final cellWidth = size.width / divisions;
     final cellHeight = size.height / divisions;
 
-    // Vertical lines
     for (int i = 1; i < divisions; i++) {
       canvas.drawLine(
         Offset(i * cellWidth, 0),
@@ -506,7 +541,6 @@ class GridPainterOverlay extends CustomPainter {
       );
     }
 
-    // Horizontal lines
     for (int i = 1; i < divisions; i++) {
       canvas.drawLine(
         Offset(0, i * cellHeight),

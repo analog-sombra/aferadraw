@@ -241,6 +241,10 @@ class DrawingNotifier extends StateNotifier<DrawingState> {
     state = state.copyWith(isShowingReferenceImage: false);
   }
 
+  void toggleRefImageDrawMode() {
+    state = state.copyWith(isRefImageDrawMode: !state.isRefImageDrawMode);
+  }
+
   void updateRefImageZoom(double delta) {
     final currentImage = state.currentRefImage;
     if (currentImage == null) return;

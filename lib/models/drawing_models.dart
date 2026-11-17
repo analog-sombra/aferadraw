@@ -94,6 +94,7 @@ class DrawingState {
   final int currentRefImageIndex;
   final bool isShowingReferenceImage;
   final bool isTransforming;
+  final bool isRefImageDrawMode;
 
   DrawingState({
     required this.lines,
@@ -106,6 +107,7 @@ class DrawingState {
     this.currentRefImageIndex = 0,
     this.isShowingReferenceImage = false,
     this.isTransforming = false,
+    this.isRefImageDrawMode = false,
   });
 
   ReferenceImage? get currentRefImage =>
@@ -124,6 +126,7 @@ class DrawingState {
     int? currentRefImageIndex,
     bool? isShowingReferenceImage,
     bool? isTransforming,
+    bool? isRefImageDrawMode,
   }) {
     return DrawingState(
       lines: lines ?? this.lines,
@@ -136,6 +139,7 @@ class DrawingState {
       currentRefImageIndex: currentRefImageIndex ?? this.currentRefImageIndex,
       isShowingReferenceImage: isShowingReferenceImage ?? this.isShowingReferenceImage,
       isTransforming: isTransforming ?? this.isTransforming,
+      isRefImageDrawMode: isRefImageDrawMode ?? this.isRefImageDrawMode,
     );
   }
 }

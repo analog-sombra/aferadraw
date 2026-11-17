@@ -19,7 +19,7 @@ class CanvasWidget extends ConsumerWidget {
         children: [
           _CanvasGestureHandler(
             canvasKey: canvasKey,
-            isShowingRef: drawingProvider.isShowingReferenceImage,
+            isShowingRef: drawingProvider.isShowingReferenceImage && !drawingProvider.isRefImageDrawMode,
             notifier: notifier,
             drawingProvider: drawingProvider,
           ),
@@ -148,7 +148,3 @@ class _CanvasGestureHandlerState extends State<_CanvasGestureHandler> {
     );
   }
 }
-
-
-
-
