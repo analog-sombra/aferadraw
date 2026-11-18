@@ -2,6 +2,7 @@ import 'dart:io';
 import 'dart:ui' as ui;
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:vector_math/vector_math_64.dart' as v3;
 import '../providers/drawing_provider.dart';
 
 class ReferenceImageViewer extends ConsumerStatefulWidget {
@@ -40,15 +41,16 @@ class _ReferenceImageViewerState extends ConsumerState<ReferenceImageViewer> {
                 alignment: Alignment.center,
                 transform: Matrix4.identity()
                   // Apply canvas transformations first
-                  ..translate(drawingProvider.offsetX, drawingProvider.offsetY)
-                  ..scale(drawingProvider.scale, drawingProvider.scale)
+                  ..translateByVector3(v3.Vector3(drawingProvider.offsetX, drawingProvider.offsetY, 0))
+                  ..scaleByVector3(v3.Vector3(drawingProvider.scale, drawingProvider.scale, 1))
                   ..rotateZ(drawingProvider.rotation)
                   // Apply reference image transformations
-                  ..translate(currentImage.offsetX, currentImage.offsetY)
-                  ..scale(
+                  ..translateByVector3(v3.Vector3(currentImage.offsetX, currentImage.offsetY, 0))
+                  ..scaleByVector3(v3.Vector3(
                       currentImage.scale *
                           (currentImage.isFlipped ? -1 : 1),
-                      currentImage.scale)
+                      currentImage.scale,
+                      1))
                   ..rotateZ(currentImage.rotation),
                 child: Opacity(
                   opacity: currentImage.opacity,
@@ -136,11 +138,12 @@ class _ReferenceImageViewerState extends ConsumerState<ReferenceImageViewer> {
                     Transform(
                       alignment: Alignment.center,
                       transform: Matrix4.identity()
-                        ..translate(currentImage.offsetX, currentImage.offsetY)
-                        ..scale(
+                        ..translateByVector3(v3.Vector3(currentImage.offsetX, currentImage.offsetY, 0))
+                        ..scaleByVector3(v3.Vector3(
                             currentImage.scale *
                                 (currentImage.isFlipped ? -1 : 1),
-                            currentImage.scale)
+                            currentImage.scale,
+                            1))
                         ..rotateZ(currentImage.rotation),
                       child: Opacity(
                         opacity: currentImage.opacity,

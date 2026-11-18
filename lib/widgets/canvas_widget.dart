@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:vector_math/vector_math_64.dart' as v3;
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../providers/drawing_provider.dart';
 import '../painters/grid_painter.dart';
@@ -120,8 +121,8 @@ class _CanvasGestureHandlerState extends State<_CanvasGestureHandler> {
             child: Transform(
               alignment: Alignment.center,
               transform: Matrix4.identity()
-                ..translate(widget.drawingProvider.offsetX, widget.drawingProvider.offsetY)
-                ..scale(widget.drawingProvider.scale, widget.drawingProvider.scale)
+                ..translateByVector3(v3.Vector3(widget.drawingProvider.offsetX, widget.drawingProvider.offsetY, 0))
+                ..scaleByVector3(v3.Vector3(widget.drawingProvider.scale, widget.drawingProvider.scale, 1))
                 ..rotateZ(widget.drawingProvider.rotation),
               child: ClipRect(
                 child: Container(
