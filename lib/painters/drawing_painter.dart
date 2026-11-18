@@ -3,8 +3,9 @@ import '../models/drawing_models.dart';
 
 class DrawingPainter extends CustomPainter {
   final List<DrawingLine> lines;
+  final double activeLayerOpacity;
 
-  DrawingPainter(this.lines);
+  DrawingPainter(this.lines, {this.activeLayerOpacity = 1.0});
 
   @override
   void paint(Canvas canvas, Size size) {
@@ -25,8 +26,9 @@ class DrawingPainter extends CustomPainter {
 
         _drawSmoothPath(canvas, line.points, paint);
       } else {
+        // Apply layer opacity to stroke color
         final paint = Paint()
-          ..color = Colors.black
+          ..color = Colors.black.withOpacity(activeLayerOpacity)
           ..strokeWidth = line.strokeWidth
           ..strokeCap = StrokeCap.round
           ..strokeJoin = StrokeJoin.round;

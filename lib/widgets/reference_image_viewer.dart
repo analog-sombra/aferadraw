@@ -3,7 +3,7 @@ import 'dart:ui' as ui;
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:vector_math/vector_math_64.dart' as v3;
-import '../providers/drawing_provider.dart';
+import '../notifiers/enhanced_drawing_notifier.dart';
 
 class ReferenceImageViewer extends ConsumerStatefulWidget {
   const ReferenceImageViewer({super.key});
@@ -20,8 +20,8 @@ class _ReferenceImageViewerState extends ConsumerState<ReferenceImageViewer> {
 
   @override
   Widget build(BuildContext context) {
-    final drawingProvider = ref.watch(drawingNotifierProvider);
-    final notifier = ref.read(drawingNotifierProvider.notifier);
+    final drawingProvider = ref.watch(enhancedDrawingNotifierProvider);
+    final notifier = ref.read(enhancedDrawingNotifierProvider.notifier);
     final currentImage = drawingProvider.currentRefImage;
     final isDrawMode = drawingProvider.isRefImageDrawMode;
 
@@ -103,7 +103,7 @@ class _ReferenceImageViewerState extends ConsumerState<ReferenceImageViewer> {
               onScaleStart: (details) {
                 _dragStartPosition = details.focalPoint;
                 if (details.pointerCount > 1) {
-                  notifier.onRefImageScaleStart(details.pointerCount);
+                  notifier.onRefImageScaleStart();
                 }
               },
               onScaleUpdate: (details) {

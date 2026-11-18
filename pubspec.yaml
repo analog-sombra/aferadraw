@@ -34,12 +34,35 @@ dependencies:
   cupertino_icons: ^1.0.8
   flutter_riverpod: ^2.6.0
   image_picker: ^1.1.2
+  vector_math: ^2.1.0
+  
+  # Data & Serialization
+  freezed_annotation: ^2.4.0
+  json_serializable: ^6.7.0
+  uuid: ^4.0.0
+  
+  # Storage & File System
+  path_provider: ^2.1.0
+  
+  # Image Processing & Filters
+  image: ^4.0.0
+  
+  # UI Enhancement
+  flutter_colorpicker: ^1.0.0
+  
+  # Local Storage
+  hive: ^2.2.0
 
 dev_dependencies:
   flutter_test:
     sdk: flutter
 
   flutter_lints: ^6.0.0
+  
+  # Code Generation
+  build_runner: ^2.4.0
+  freezed: ^2.4.0
+  json_serializable: ^6.7.0
 
 # For information on the generic Dart part of this file, see the
 # following page: https://dart.dev/tools/pub/pubspec

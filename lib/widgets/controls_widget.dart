@@ -2,20 +2,24 @@ import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:image_picker/image_picker.dart';
-import '../providers/drawing_provider.dart';
+import '../notifiers/enhanced_drawing_notifier.dart';
+import '../models/drawing_models.dart';
 
 class ControlsWidget extends ConsumerWidget {
   const ControlsWidget({super.key});
 
   Future<void> _pickReferenceImage(WidgetRef ref) async {
-    final notifier = ref.read(drawingNotifierProvider.notifier);
+    final notifier = ref.read(enhancedDrawingNotifierProvider.notifier);
     final picker = ImagePicker();
     
     try {
       final pickedFile = await picker.pickImage(source: ImageSource.gallery);
       
       if (pickedFile != null) {
-        notifier.addReferenceImage(pickedFile.path);
+        notifier.addReferenceImage(ReferenceImage(
+          id: DateTime.now().millisecondsSinceEpoch.toString(),
+          imagePath: pickedFile.path,
+        ));
       }
     } catch (e) {
       debugPrint('Error picking image: $e');
@@ -24,8 +28,8 @@ class ControlsWidget extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final drawingProvider = ref.watch(drawingNotifierProvider);
-    final notifier = ref.read(drawingNotifierProvider.notifier);
+    final drawingProvider = ref.watch(enhancedDrawingNotifierProvider);
+    final notifier = ref.read(enhancedDrawingNotifierProvider.notifier);
     final hasImages = drawingProvider.referenceImages.isNotEmpty;
     final currentImage = drawingProvider.currentRefImage;
 

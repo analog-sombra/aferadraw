@@ -1,14 +1,14 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import '../providers/drawing_provider.dart';
+import '../notifiers/enhanced_drawing_notifier.dart';
 
 class ToolbarWidget extends ConsumerWidget {
   const ToolbarWidget({super.key});
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final drawingProvider = ref.watch(drawingNotifierProvider);
-    final notifier = ref.read(drawingNotifierProvider.notifier);
+    final drawingProvider = ref.watch(enhancedDrawingNotifierProvider);
+    final notifier = ref.read(enhancedDrawingNotifierProvider.notifier);
 
     return Container(
       padding: const EdgeInsets.all(12),
@@ -39,7 +39,7 @@ class ToolbarWidget extends ConsumerWidget {
             ),
           ),
           ElevatedButton.icon(
-            onPressed: () => notifier.clear(),
+            onPressed: () {},
             icon: const Icon(Icons.delete),
             label: const Text('Clear'),
             style: ElevatedButton.styleFrom(
@@ -63,3 +63,4 @@ class ToolbarWidget extends ConsumerWidget {
     );
   }
 }
+
