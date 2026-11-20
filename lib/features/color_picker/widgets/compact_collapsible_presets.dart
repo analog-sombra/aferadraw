@@ -42,7 +42,7 @@ class CompactCollapsiblePresetsSelector extends ConsumerWidget {
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
                 Text(
-                  showAI ? '✨ AI Palettes' : '🎨 Palettes',
+                  showAI ? '✨ Palettes' : '🎨 Palettes',
                   style: Theme.of(context).textTheme.titleSmall?.copyWith(
                         color: Colors.white,
                         fontWeight: FontWeight.w600,
@@ -51,7 +51,8 @@ class CompactCollapsiblePresetsSelector extends ConsumerWidget {
                 GestureDetector(
                   onTap: () => _openPaletteSelector(context),
                   child: Container(
-                    padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                    padding:
+                        const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
                     decoration: BoxDecoration(
                       color: Colors.grey[800],
                       borderRadius: BorderRadius.circular(4),
@@ -84,7 +85,7 @@ class CompactCollapsiblePresetsSelector extends ConsumerWidget {
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   Text(
-                    '📌 My AI Palettes',
+                    '📌 My AI Palettes (${customPalettes.length})',
                     style: TextStyle(
                       color: Colors.cyan[400],
                       fontSize: 11,
@@ -93,81 +94,97 @@ class CompactCollapsiblePresetsSelector extends ConsumerWidget {
                     ),
                   ),
                   const SizedBox(height: 8),
-                  Wrap(
-                    spacing: 8,
-                    runSpacing: 8,
-                    children: customPalettes.entries.map((entry) {
-                      final paletteName = entry.key;
-                      final colors = entry.value;
-                      return Tooltip(
-                        message: paletteName,
-                        child: GestureDetector(
-                          onTap: () {
-                            if (colors.isNotEmpty) {
-                              ref.read(colorPickerProvider.notifier).setColor(colors[0]);
-                            }
-                          },
-                          child: Container(
-                            padding: const EdgeInsets.symmetric(
-                              horizontal: 8,
-                              vertical: 6,
-                            ),
-                            decoration: BoxDecoration(
-                              color: Colors.grey[900],
-                              borderRadius: BorderRadius.circular(6),
-                              border: Border.all(
-                                color: Colors.cyan[500]!,
-                                width: 1.5,
+                  if (customPalettes.isEmpty)
+                    Text(
+                      'No AI palettes yet',
+                      style: TextStyle(
+                        color: Colors.grey[600],
+                        fontSize: 10,
+                      ),
+                    )
+                  else
+                    Wrap(
+                      spacing: 8,
+                      runSpacing: 8,
+                      children: customPalettes.entries.map((entry) {
+                        final paletteName = entry.key;
+                        final colors = entry.value;
+                        return Tooltip(
+                          message: paletteName,
+                          child: GestureDetector(
+                            onTap: () {
+                              if (colors.isNotEmpty) {
+                                ref
+                                    .read(colorPickerProvider.notifier)
+                                    .setColor(colors[0]);
+                              }
+                            },
+                            child: Container(
+                              padding: const EdgeInsets.symmetric(
+                                horizontal: 8,
+                                vertical: 6,
                               ),
-                              boxShadow: [
-                                BoxShadow(
-                                  color: Colors.cyan[700]!.withOpacity(0.2),
-                                  blurRadius: 4,
-                                )
-                              ],
-                            ),
-                            child: Row(
-                              mainAxisSize: MainAxisSize.min,
-                              children: [
-                                for (int i = 0;
-                                    i < (colors.length > 4 ? 4 : colors.length);
-                                    i++)
-                                  Container(
-                                    width: 16,
-                                    height: 16,
-                                    margin: EdgeInsets.only(
-                                      right: i <
-                                              (colors.length > 4 ? 3 : colors.length - 1)
-                                          ? 2
-                                          : 0,
+                              decoration: BoxDecoration(
+                                color: Colors.grey[900],
+                                borderRadius: BorderRadius.circular(6),
+                                border: Border.all(
+                                  color: Colors.cyan[500]!,
+                                  width: 1.5,
+                                ),
+                                boxShadow: [
+                                  BoxShadow(
+                                    color: Colors.cyan[700]!.withOpacity(0.2),
+                                    blurRadius: 4,
+                                  )
+                                ],
+                              ),
+                              child: Row(
+                                mainAxisSize: MainAxisSize.min,
+                                children: [
+                                  Text(
+                                    paletteName,
+                                    style: TextStyle(
+                                      color: Colors.cyan[300],
+                                      fontSize: 10,
+                                      fontWeight: FontWeight.w500,
                                     ),
-                                    decoration: BoxDecoration(
-                                      color: colors[i],
-                                      borderRadius: BorderRadius.circular(2),
-                                      border: Border.all(
-                                        color: Colors.grey[800]!,
-                                        width: 0.5,
+                                  ),
+                                  const SizedBox(width: 6),
+                                  for (int i = 0;
+                                      i < (colors.length > 5 ? 5 : colors.length);
+                                      i++)
+                                    Container(
+                                      width: 14,
+                                      height: 14,
+                                      margin: EdgeInsets.only(
+                                        right: i < (colors.length > 5 ? 4 : colors.length - 1)
+                                            ? 2
+                                            : 0,
+                                      ),
+                                      decoration: BoxDecoration(
+                                        color: colors[i],
+                                        borderRadius: BorderRadius.circular(2),
+                                        border: Border.all(
+                                          color: Colors.grey[800]!,
+                                          width: 0.5,
+                                        ),
                                       ),
                                     ),
-                                  ),
-                                if (colors.length > 4) ...[
-                                  const SizedBox(width: 2),
-                                  Text(
-                                    '+${colors.length - 4}',
-                                    style: TextStyle(
-                                      color: Colors.cyan[400],
-                                      fontSize: 9,
-                                      fontWeight: FontWeight.w600,
+                                  if (colors.length > 5)
+                                    Text(
+                                      ' +${colors.length - 5}',
+                                      style: TextStyle(
+                                        color: Colors.cyan[300],
+                                        fontSize: 9,
+                                      ),
                                     ),
-                                  ),
-                                ]
-                              ],
+                                ],
+                              ),
                             ),
                           ),
-                        ),
-                      );
-                    }).toList(),
-                  ),
+                        );
+                      }).toList(),
+                    ),
                 ],
               ),
             ),
@@ -184,7 +201,7 @@ class CompactCollapsiblePresetsSelector extends ConsumerWidget {
                     children: [
                       Expanded(
                         child: Text(
-                          selectedPreset!.name,
+                          selectedPreset.name,
                           style: TextStyle(
                             color: Colors.blue[400],
                             fontSize: 11,
@@ -214,7 +231,9 @@ class CompactCollapsiblePresetsSelector extends ConsumerWidget {
                         final color = selectedPreset.colors[idx];
                         return GestureDetector(
                           onTap: () {
-                            ref.read(colorPickerProvider.notifier).setColor(color);
+                            ref
+                                .read(colorPickerProvider.notifier)
+                                .setColor(color);
                           },
                           child: Tooltip(
                             message: _colorToHex(color),
