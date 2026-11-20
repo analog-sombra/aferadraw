@@ -53,6 +53,7 @@ class DrawingScreen extends ConsumerWidget {
               top: MediaQuery.of(context).size.height / 2 - 28,
               child: FloatingActionButton(
                 mini: true,
+                heroTag: 'layer_fab',
                 onPressed: () {
                   ref.read(layerPanelOpenProvider.notifier).state =
                       !isLayerPanelOpen;
@@ -76,6 +77,7 @@ class DrawingScreen extends ConsumerWidget {
               top: MediaQuery.of(context).size.height / 2 + 36,
               child: FloatingActionButton(
                 mini: true,
+                heroTag: 'color_picker_fab',
                 onPressed: () {
                   ref.read(colorPickerOpenProvider.notifier).state =
                       !isColorPickerOpen;
