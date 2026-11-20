@@ -22,10 +22,9 @@ class CompactCollapsiblePresetsSelector extends ConsumerWidget {
     final selectedPreset = presets.isNotEmpty ? presets[selectedIndex] : null;
     final colorState = ref.watch(colorPickerProvider);
     final customPalettes = colorState.customPalettes;
-    final displayMode = ref.watch(paletteDisplayModeProvider);
 
-    final showAI = displayMode == 'ai' && customPalettes.isNotEmpty;
-    final showNormal = displayMode == 'normal' && selectedPreset != null;
+    final showAI = customPalettes.isNotEmpty;
+    final showNormal = selectedPreset != null && customPalettes.isEmpty;
 
     return Container(
       margin: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
@@ -36,156 +35,41 @@ class CompactCollapsiblePresetsSelector extends ConsumerWidget {
       ),
       child: Column(
         children: [
-          // Header with Toggle Buttons
+          // Header without Toggle Buttons
           Padding(
             padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
-            child: Column(
+            child: Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                  children: [
-                    Text(
-                      '🎨 Palettes',
-                      style: Theme.of(context).textTheme.titleSmall?.copyWith(
-                            color: Colors.white,
-                            fontWeight: FontWeight.w600,
-                          ),
-                    ),
-                    GestureDetector(
-                      onTap: () => _openPaletteSelector(context),
-                      child: Container(
-                        padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
-                        decoration: BoxDecoration(
-                          color: Colors.grey[800],
-                          borderRadius: BorderRadius.circular(4),
-                          border: Border.all(color: Colors.grey[600]!, width: 0.5),
-                        ),
-                        child: const Row(
-                          children: [
-                            Icon(Icons.open_in_full, color: Colors.grey, size: 14),
-                            SizedBox(width: 4),
-                            Text(
-                              'Browse',
-                              style: TextStyle(
-                                color: Colors.grey,
-                                fontSize: 11,
-                              ),
-                            ),
-                          ],
-                        ),
+                Text(
+                  showAI ? '✨ AI Palettes' : '🎨 Palettes',
+                  style: Theme.of(context).textTheme.titleSmall?.copyWith(
+                        color: Colors.white,
+                        fontWeight: FontWeight.w600,
                       ),
-                    ),
-                  ],
                 ),
-                const SizedBox(height: 10),
-                // Toggle Buttons
-                Container(
-                  decoration: BoxDecoration(
-                    color: Colors.grey[900],
-                    borderRadius: BorderRadius.circular(6),
-                    border: Border.all(color: Colors.grey[700]!, width: 0.5),
-                  ),
-                  child: Row(
-                    children: [
-                      // Normal Template Button
-                      Expanded(
-                        child: GestureDetector(
-                          onTap: customPalettes.isEmpty
-                              ? null
-                              : () {
-                                  ref.read(paletteDisplayModeProvider.notifier).state = 'normal';
-                                },
-                          child: Container(
-                            padding: const EdgeInsets.symmetric(vertical: 8),
-                            decoration: BoxDecoration(
-                              color: displayMode == 'normal'
-                                  ? Colors.blue[700]
-                                  : Colors.transparent,
-                              borderRadius: const BorderRadius.only(
-                                topLeft: Radius.circular(5),
-                                bottomLeft: Radius.circular(5),
-                              ),
-                            ),
-                            child: Column(
-                              children: [
-                                Icon(
-                                  Icons.palette,
-                                  size: 14,
-                                  color: displayMode == 'normal'
-                                      ? Colors.white
-                                      : Colors.grey[500],
-                                ),
-                                const SizedBox(height: 2),
-                                Text(
-                                  'Normal',
-                                  style: TextStyle(
-                                    color: displayMode == 'normal'
-                                        ? Colors.white
-                                        : Colors.grey[500],
-                                    fontSize: 9,
-                                    fontWeight: FontWeight.w500,
-                                  ),
-                                ),
-                              ],
-                            ),
+                GestureDetector(
+                  onTap: () => _openPaletteSelector(context),
+                  child: Container(
+                    padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                    decoration: BoxDecoration(
+                      color: Colors.grey[800],
+                      borderRadius: BorderRadius.circular(4),
+                      border: Border.all(color: Colors.grey[600]!, width: 0.5),
+                    ),
+                    child: const Row(
+                      children: [
+                        Icon(Icons.open_in_full, color: Colors.grey, size: 14),
+                        SizedBox(width: 4),
+                        Text(
+                          'Browse',
+                          style: TextStyle(
+                            color: Colors.grey,
+                            fontSize: 11,
                           ),
                         ),
-                      ),
-                      // Divider
-                      Container(
-                        width: 0.5,
-                        height: 30,
-                        color: Colors.grey[700],
-                      ),
-                      // AI Template Button
-                      Expanded(
-                        child: GestureDetector(
-                          onTap: customPalettes.isEmpty
-                              ? null
-                              : () {
-                                  ref.read(paletteDisplayModeProvider.notifier).state = 'ai';
-                                },
-                          child: Container(
-                            padding: const EdgeInsets.symmetric(vertical: 8),
-                            decoration: BoxDecoration(
-                              color: displayMode == 'ai'
-                                  ? Colors.cyan[700]
-                                  : Colors.transparent,
-                              borderRadius: const BorderRadius.only(
-                                topRight: Radius.circular(5),
-                                bottomRight: Radius.circular(5),
-                              ),
-                            ),
-                            child: Column(
-                              children: [
-                                Icon(
-                                  Icons.auto_awesome,
-                                  size: 14,
-                                  color: displayMode == 'ai'
-                                      ? Colors.white
-                                      : (customPalettes.isEmpty
-                                          ? Colors.grey[700]
-                                          : Colors.grey[500]),
-                                ),
-                                const SizedBox(height: 2),
-                                Text(
-                                  'AI Color',
-                                  style: TextStyle(
-                                    color: displayMode == 'ai'
-                                        ? Colors.white
-                                        : (customPalettes.isEmpty
-                                            ? Colors.grey[700]
-                                            : Colors.grey[500]),
-                                    fontSize: 9,
-                                    fontWeight: FontWeight.w500,
-                                  ),
-                                ),
-                              ],
-                            ),
-                          ),
-                        ),
-                      ),
-                    ],
+                      ],
+                    ),
                   ),
                 ),
               ],
