@@ -5,6 +5,8 @@ import '../../widgets/canvas_widget.dart';
 import '../../widgets/controls_widget.dart';
 import '../../features/layers/widgets/layer_panel.dart';
 import '../../features/layers/providers/layer_panel_provider.dart';
+import '../../features/color_picker/widgets/color_picker_panel.dart';
+import '../../features/color_picker/providers/color_picker_provider.dart';
 
 class DrawingScreen extends ConsumerWidget {
   const DrawingScreen({super.key});
@@ -12,6 +14,7 @@ class DrawingScreen extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final isLayerPanelOpen = ref.watch(layerPanelOpenProvider);
+    final isColorPickerOpen = ref.watch(colorPickerOpenProvider);
 
     return Scaffold(
       body: SafeArea(
@@ -24,6 +27,14 @@ class DrawingScreen extends ConsumerWidget {
                 const CanvasWidget(),
                 const ControlsWidget(),
               ],
+            ),
+
+            // Color Picker Panel (Slides from left)
+            ColorPickerPanelWidget(
+              isOpen: isColorPickerOpen,
+              onClose: () {
+                ref.read(colorPickerOpenProvider.notifier).state = false;
+              },
             ),
 
             // Layer Panel (Slides from right)
@@ -51,6 +62,29 @@ class DrawingScreen extends ConsumerWidget {
                 shape: const CircleBorder(),
                 child: Icon(
                   isLayerPanelOpen ? Icons.layers_clear : Icons.layers,
+                  color: Colors.white,
+                  size: 24,
+                ),
+              ),
+            ),
+
+            // Floating Color Picker Button (Right side, below layer FAB)
+            AnimatedPositioned(
+              duration: const Duration(milliseconds: 300),
+              curve: Curves.easeInOut,
+              right: isLayerPanelOpen ? 320 + 4 : 4,
+              top: MediaQuery.of(context).size.height / 2 + 36,
+              child: FloatingActionButton(
+                mini: true,
+                onPressed: () {
+                  ref.read(colorPickerOpenProvider.notifier).state =
+                      !isColorPickerOpen;
+                },
+                backgroundColor: Colors.orange,
+                elevation: 8,
+                shape: const CircleBorder(),
+                child: const Icon(
+                  Icons.palette,
                   color: Colors.white,
                   size: 24,
                 ),
