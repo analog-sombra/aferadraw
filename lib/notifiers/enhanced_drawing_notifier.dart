@@ -3,6 +3,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:uuid/uuid.dart';
 import '../models/drawing_models.dart';
 import '../features/layers/models/layer_canvas_model.dart';
+import '../features/color_picker/providers/color_picker_provider.dart';
 
 /// Enhanced drawing state that includes per-layer canvas data
 class EnhancedDrawingState {
@@ -86,6 +87,9 @@ class EnhancedDrawingNotifier extends StateNotifier<EnhancedDrawingState> {
   // Drag tracking
   Offset _dragStartPosition = Offset.zero;
   double _dragStartScale = 1.0;
+  
+  // For color tracking
+  dynamic colorPickerRef;
 
   void setBrush() {
     state = state.copyWith(isErasing: false);
@@ -118,6 +122,17 @@ class EnhancedDrawingNotifier extends StateNotifier<EnhancedDrawingState> {
       var newStorage = state.layerCanvasStorage;
       newStorage = newStorage.addStrokeToLayer(layerId, newStroke);
       state = state.copyWith(layerCanvasStorage: newStorage);
+      
+      // Track color when user starts drawing (not erasing)
+      if (!state.isErasing && colorPickerRef != null) {
+        try {
+          final colorPickerNotifier = colorPickerRef.read(colorPickerProvider.notifier);
+          final selectedColor = colorPickerRef.read(colorPickerProvider).selectedColor;
+          colorPickerNotifier.trackColorUsedOnCanvas(selectedColor);
+        } catch (e) {
+          // Silently ignore if color tracking fails
+        }
+      }
     }
   }
 
@@ -415,5 +430,8 @@ class EnhancedDrawingNotifier extends StateNotifier<EnhancedDrawingState> {
 
 final enhancedDrawingNotifierProvider =
     StateNotifierProvider<EnhancedDrawingNotifier, EnhancedDrawingState>((ref) {
-  return EnhancedDrawingNotifier();
+  final notifier = EnhancedDrawingNotifier();
+  // Store ref for later use to track colors
+  notifier.colorPickerRef = ref;
+  return notifier;
 });

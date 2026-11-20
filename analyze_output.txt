@@ -1,0 +1,25 @@
+Analyzing aferadraw...
+
+warning - lib\features\color_picker\providers\color_presets_provider.dart:10:22 - Unnecessary cast. Try removing the cast. - unnecessary_cast
+warning - lib\notifiers\enhanced_drawing_notifier.dart:88:10 - The value of the field '_dragStartPosition' isn't used. Try removing the field, or using it. - unused_field
+warning - lib\notifiers\enhanced_drawing_notifier.dart:89:10 - The value of the field '_dragStartScale' isn't used. Try removing the field, or using it. - unused_field
+warning - pubspec.yaml:65:3 - The dev dependency on json_serializable is unnecessary because there is also a normal dependency on that package. Try removing the dev dependency. - unnecessary_dev_dependency
+   info - lib\features\color_picker\providers\color_presets_provider_OLD.dart:1:1 - The file name 'color_presets_provider_OLD.dart' isn't a lower_case_with_underscores identifier. Try changing the name to follow the lower_case_with_underscores style. - file_names
+   info - lib\features\color_picker\widgets\color_preset_selector.dart:9:9 - Parameter 'key' could be a super parameter. Trying converting 'key' to a super parameter. - use_super_parameters
+   info - lib\features\color_picker\widgets\color_preset_selector.dart:224:52 - 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss. Try replacing the use of the deprecated member with the replacement. - deprecated_member_use
+   info - lib\features\color_picker\widgets\color_preset_selector.dart:335:22 - 'value' is deprecated and shouldn't be used. Use component accessors like .r or .g, or toARGB32 for an explicit conversion. Try replacing the use of the deprecated member with the replacement. - deprecated_member_use
+   info - lib\features\color_picker\widgets\color_presets_page.dart:7:9 - Parameter 'key' could be a super parameter. Trying converting 'key' to a super parameter. - use_super_parameters
+   info - lib\features\color_picker\widgets\compact_preset_selector.dart:7:9 - Parameter 'key' could be a super parameter. Trying converting 'key' to a super parameter. - use_super_parameters
+   info - lib\features\color_picker\widgets\compact_preset_selector.dart:180:50 - 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss. Try replacing the use of the deprecated member with the replacement. - deprecated_member_use
+   info - lib\features\color_picker\widgets\enhanced_preset_selector.dart:325:23 - 'value' is deprecated and shouldn't be used. Use component accessors like .r or .g, or toARGB32 for an explicit conversion. Try replacing the use of the deprecated member with the replacement. - deprecated_member_use
+   info - lib\features\layers\widgets\layer_tile.dart:86:52 - 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss. Try replacing the use of the deprecated member with the replacement. - deprecated_member_use
+   info - lib\features\layers\widgets\layer_tile.dart:173:25 - The 'child' argument should be last in widget constructor invocations. Try moving the argument to the end of the argument list. - sort_child_properties_last
+   info - lib\features\layers\widgets\layer_tile.dart:177:25 - The 'child' argument should be last in widget constructor invocations. Try moving the argument to the end of the argument list. - sort_child_properties_last
+   info - lib\features\layers\widgets\layer_tile.dart:181:25 - The 'child' argument should be last in widget constructor invocations. Try moving the argument to the end of the argument list. - sort_child_properties_last
+   info - lib\features\layers\widgets\layer_tile.dart:186:27 - The 'child' argument should be last in widget constructor invocations. Try moving the argument to the end of the argument list. - sort_child_properties_last
+   info - lib\notifiers\enhanced_drawing_notifier.dart:89:10 - The private field _dragStartScale could be 'final'. Try making the field 'final'. - prefer_final_fields
+   info - lib\painters\drawing_painter.dart:31:34 - 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss. Try replacing the use of the deprecated member with the replacement. - deprecated_member_use
+   info - lib\painters\enhanced_drawing_painter.dart:43:36 - 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss. Try replacing the use of the deprecated member with the replacement. - deprecated_member_use
+   info - lib\painters\enhanced_drawing_painter.dart:73:32 - 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss. Try replacing the use of the deprecated member with the replacement. - deprecated_member_use
+
+21 issues found.
