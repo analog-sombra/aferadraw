@@ -65,12 +65,12 @@ class _PaletteSelectorPageState extends ConsumerState<PaletteSelectorPage>
 
   void _selectApiPalette(ColorPalette palette) {
     // Convert API palette colors (hex strings) to Color objects
-    final colors = palette.colors
-        .map((hexColor) => _parseColor(hexColor))
-        .toList();
+    final colors =
+        palette.colors.map((hexColor) => _parseColor(hexColor)).toList();
 
     // Add to custom palettes
-    ref.read(colorPickerProvider.notifier)
+    ref
+        .read(colorPickerProvider.notifier)
         .addCustomPalette(palette.name, colors);
 
     // Select first color
@@ -126,8 +126,7 @@ class _PaletteSelectorPageState extends ConsumerState<PaletteSelectorPage>
     );
   }
 
-  Widget _buildLocalPalettesTab(
-      List<ColorPreset> presets, int selectedIndex) {
+  Widget _buildLocalPalettesTab(List<ColorPreset> presets, int selectedIndex) {
     return Column(
       children: [
         // Search bar
@@ -139,18 +138,17 @@ class _PaletteSelectorPageState extends ConsumerState<PaletteSelectorPage>
             style: const TextStyle(color: Colors.white, fontSize: 13),
             decoration: InputDecoration(
               hintText: 'Search palettes...',
-              hintStyle:
-                  const TextStyle(color: Colors.grey, fontSize: 13),
-              prefixIcon: const Icon(Icons.search,
-                  color: Colors.grey, size: 18),
+              hintStyle: const TextStyle(color: Colors.grey, fontSize: 13),
+              prefixIcon:
+                  const Icon(Icons.search, color: Colors.grey, size: 18),
               suffixIcon: _searchController.text.isNotEmpty
                   ? GestureDetector(
                       onTap: () {
                         _searchController.clear();
                         _updateFilteredList('');
                       },
-                      child: const Icon(Icons.clear,
-                          color: Colors.grey, size: 18),
+                      child:
+                          const Icon(Icons.clear, color: Colors.grey, size: 18),
                     )
                   : null,
               filled: true,
@@ -159,18 +157,15 @@ class _PaletteSelectorPageState extends ConsumerState<PaletteSelectorPage>
                   const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
               border: OutlineInputBorder(
                 borderRadius: BorderRadius.circular(6),
-                borderSide:
-                    BorderSide(color: Colors.grey[700]!, width: 1),
+                borderSide: BorderSide(color: Colors.grey[700]!, width: 1),
               ),
               enabledBorder: OutlineInputBorder(
                 borderRadius: BorderRadius.circular(6),
-                borderSide:
-                    BorderSide(color: Colors.grey[700]!, width: 1),
+                borderSide: BorderSide(color: Colors.grey[700]!, width: 1),
               ),
               focusedBorder: OutlineInputBorder(
                 borderRadius: BorderRadius.circular(6),
-                borderSide:
-                    const BorderSide(color: Colors.blue, width: 1.5),
+                borderSide: const BorderSide(color: Colors.blue, width: 1.5),
               ),
             ),
           ),
@@ -200,8 +195,7 @@ class _PaletteSelectorPageState extends ConsumerState<PaletteSelectorPage>
                 )
               : GridView.builder(
                   padding: const EdgeInsets.all(12),
-                  gridDelegate:
-                      const SliverGridDelegateWithFixedCrossAxisCount(
+                  gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
                     crossAxisCount: 2,
                     childAspectRatio: 1.4,
                     mainAxisSpacing: 12,
@@ -217,14 +211,11 @@ class _PaletteSelectorPageState extends ConsumerState<PaletteSelectorPage>
                       onTap: () => _selectPalette(paletteIdx, preset),
                       child: Container(
                         decoration: BoxDecoration(
-                          color: isSelected
-                              ? Colors.grey[800]
-                              : Colors.grey[900],
+                          color:
+                              isSelected ? Colors.grey[800] : Colors.grey[900],
                           borderRadius: BorderRadius.circular(8),
                           border: Border.all(
-                            color: isSelected
-                                ? Colors.blue
-                                : Colors.grey[700]!,
+                            color: isSelected ? Colors.blue : Colors.grey[700]!,
                             width: isSelected ? 2 : 1,
                           ),
                           boxShadow: isSelected
@@ -239,8 +230,7 @@ class _PaletteSelectorPageState extends ConsumerState<PaletteSelectorPage>
                         ),
                         padding: const EdgeInsets.all(12),
                         child: Column(
-                          crossAxisAlignment:
-                              CrossAxisAlignment.start,
+                          crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
                             Text(
                               preset.name,
@@ -257,8 +247,7 @@ class _PaletteSelectorPageState extends ConsumerState<PaletteSelectorPage>
                               child: Container(
                                 width: double.infinity,
                                 decoration: BoxDecoration(
-                                  borderRadius:
-                                      BorderRadius.circular(4),
+                                  borderRadius: BorderRadius.circular(4),
                                   border: Border.all(
                                     color: Colors.grey[700]!,
                                     width: 1,
@@ -272,13 +261,12 @@ class _PaletteSelectorPageState extends ConsumerState<PaletteSelectorPage>
                                       return Expanded(
                                         child: GestureDetector(
                                           onTap: () {
-                                            _selectPalette(paletteIdx,
-                                                preset);
+                                            _selectPalette(paletteIdx, preset);
                                             ref
                                                 .read(colorPickerProvider
                                                     .notifier)
-                                                .setColor(preset
-                                                    .colors[colorIdx]);
+                                                .setColor(
+                                                    preset.colors[colorIdx]);
                                           },
                                           child: Tooltip(
                                             message: _colorToHex(
@@ -286,18 +274,14 @@ class _PaletteSelectorPageState extends ConsumerState<PaletteSelectorPage>
                                             child: Container(
                                               margin: EdgeInsets.only(
                                                 right: colorIdx <
-                                                        preset.colors
-                                                                .length -
-                                                            1
+                                                        preset.colors.length - 1
                                                     ? 2
                                                     : 0,
                                               ),
                                               decoration: BoxDecoration(
-                                                color: preset
-                                                    .colors[colorIdx],
+                                                color: preset.colors[colorIdx],
                                                 borderRadius:
-                                                    BorderRadius
-                                                        .circular(2),
+                                                    BorderRadius.circular(2),
                                               ),
                                             ),
                                           ),
@@ -329,30 +313,26 @@ class _PaletteSelectorPageState extends ConsumerState<PaletteSelectorPage>
             children: [
               TextField(
                 onChanged: (value) {
-                  ref.read(apiPaletteSearchProvider.notifier).state =
-                      value;
+                  ref.read(apiPaletteSearchProvider.notifier).state = value;
                   ref.read(apiPalettePageProvider.notifier).state = 1;
                 },
                 style: const TextStyle(color: Colors.white, fontSize: 13),
                 decoration: InputDecoration(
                   hintText: 'Search AI Color palettes...',
-                  hintStyle:
-                      const TextStyle(color: Colors.grey, fontSize: 13),
-                  prefixIcon: const Icon(Icons.search,
-                      color: Colors.grey, size: 18),
+                  hintStyle: const TextStyle(color: Colors.grey, fontSize: 13),
+                  prefixIcon:
+                      const Icon(Icons.search, color: Colors.grey, size: 18),
                   filled: true,
                   fillColor: Colors.grey[900],
-                  contentPadding: const EdgeInsets.symmetric(
-                      horizontal: 12, vertical: 10),
+                  contentPadding:
+                      const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
                   border: OutlineInputBorder(
                     borderRadius: BorderRadius.circular(6),
-                    borderSide:
-                        BorderSide(color: Colors.grey[700]!, width: 1),
+                    borderSide: BorderSide(color: Colors.grey[700]!, width: 1),
                   ),
                   enabledBorder: OutlineInputBorder(
                     borderRadius: BorderRadius.circular(6),
-                    borderSide:
-                        BorderSide(color: Colors.grey[700]!, width: 1),
+                    borderSide: BorderSide(color: Colors.grey[700]!, width: 1),
                   ),
                   focusedBorder: OutlineInputBorder(
                     borderRadius: BorderRadius.circular(6),
@@ -434,10 +414,9 @@ class _PaletteSelectorPageState extends ConsumerState<PaletteSelectorPage>
                         ],
                         onChanged: (value) {
                           if (value != null) {
-                            ref.read(apiPaletteSortProvider.notifier)
-                                .state = value;
-                            ref.read(apiPalettePageProvider.notifier)
-                                .state = 1;
+                            ref.read(apiPaletteSortProvider.notifier).state =
+                                value;
+                            ref.read(apiPalettePageProvider.notifier).state = 1;
                           }
                         },
                       ),
@@ -570,6 +549,9 @@ class _PaletteSelectorPageState extends ConsumerState<PaletteSelectorPage>
                     itemCount: response.data.length,
                     itemBuilder: (context, idx) {
                       final palette = response.data[idx];
+                      // log the palette
+                      print(
+                          '🎨 PaletteSelectorPage - palette: ${palette.name}');
 
                       return GestureDetector(
                         onTap: () {
@@ -586,8 +568,7 @@ class _PaletteSelectorPageState extends ConsumerState<PaletteSelectorPage>
                           ),
                           padding: const EdgeInsets.all(12),
                           child: Column(
-                            crossAxisAlignment:
-                                CrossAxisAlignment.start,
+                            crossAxisAlignment: CrossAxisAlignment.start,
                             children: [
                               Row(
                                 children: [
@@ -597,10 +578,8 @@ class _PaletteSelectorPageState extends ConsumerState<PaletteSelectorPage>
                                       style: const TextStyle(
                                         color: Colors.white,
                                         fontSize: 12,
-                                        fontWeight:
-                                            FontWeight.w600,
-                                        overflow:
-                                            TextOverflow.ellipsis,
+                                        fontWeight: FontWeight.w600,
+                                        overflow: TextOverflow.ellipsis,
                                       ),
                                       maxLines: 2,
                                     ),
@@ -616,31 +595,23 @@ class _PaletteSelectorPageState extends ConsumerState<PaletteSelectorPage>
                                       .take(3)
                                       .map(
                                         (tag) => Container(
-                                          padding:
-                                              const EdgeInsets
-                                                  .symmetric(
+                                          padding: const EdgeInsets.symmetric(
                                             horizontal: 6,
                                             vertical: 2,
                                           ),
                                           decoration: BoxDecoration(
-                                            color:
-                                                Colors.blue
-                                                    .withOpacity(
-                                                        0.2),
+                                            color: Colors.blue.withOpacity(0.2),
                                             borderRadius:
-                                                BorderRadius
-                                                    .circular(3),
+                                                BorderRadius.circular(3),
                                             border: Border.all(
-                                              color: Colors.blue
-                                                  .withOpacity(
-                                                      0.5),
+                                              color:
+                                                  Colors.blue.withOpacity(0.5),
                                               width: 0.5,
                                             ),
                                           ),
                                           child: Text(
                                             tag,
-                                            style:
-                                                const TextStyle(
+                                            style: const TextStyle(
                                               color: Colors.blue,
                                               fontSize: 9,
                                             ),
@@ -655,15 +626,13 @@ class _PaletteSelectorPageState extends ConsumerState<PaletteSelectorPage>
                                 child: Container(
                                   width: double.infinity,
                                   decoration: BoxDecoration(
-                                    borderRadius:
-                                        BorderRadius.circular(4),
+                                    borderRadius: BorderRadius.circular(4),
                                     border: Border.all(
                                       color: Colors.grey[700]!,
                                       width: 1,
                                     ),
                                   ),
-                                  padding:
-                                      const EdgeInsets.all(4),
+                                  padding: const EdgeInsets.all(4),
                                   child: Row(
                                     children: List.generate(
                                       palette.colors.length,
@@ -673,30 +642,23 @@ class _PaletteSelectorPageState extends ConsumerState<PaletteSelectorPage>
                                         return Expanded(
                                           child: GestureDetector(
                                             onTap: () {
-                                              _selectApiColor(
-                                                  color);
+                                              _selectApiColor(color);
                                             },
                                             child: Tooltip(
-                                              message: palette
-                                                  .colors[colorIdx],
+                                              message: palette.colors[colorIdx],
                                               child: Container(
-                                                margin: EdgeInsets
-                                                    .only(
+                                                margin: EdgeInsets.only(
                                                   right: colorIdx <
-                                                          palette
-                                                                  .colors
+                                                          palette.colors
                                                                   .length -
                                                               1
                                                       ? 2
                                                       : 0,
                                                 ),
-                                                decoration:
-                                                    BoxDecoration(
+                                                decoration: BoxDecoration(
                                                   color: color,
                                                   borderRadius:
-                                                      BorderRadius
-                                                          .circular(
-                                                              2),
+                                                      BorderRadius.circular(2),
                                                 ),
                                               ),
                                             ),
@@ -710,8 +672,7 @@ class _PaletteSelectorPageState extends ConsumerState<PaletteSelectorPage>
                               const SizedBox(height: 6),
                               Row(
                                 mainAxisAlignment:
-                                    MainAxisAlignment
-                                        .spaceBetween,
+                                    MainAxisAlignment.spaceBetween,
                                 children: [
                                   Text(
                                     '${palette.colors.length} colors',
@@ -731,8 +692,7 @@ class _PaletteSelectorPageState extends ConsumerState<PaletteSelectorPage>
                                       Text(
                                         '${palette.likes}',
                                         style: TextStyle(
-                                          color:
-                                              Colors.grey[600],
+                                          color: Colors.grey[600],
                                           fontSize: 10,
                                         ),
                                       ),

@@ -158,3 +158,6 @@ final colorPickerProvider =
 });
 
 final colorPickerOpenProvider = StateProvider<bool>((ref) => false);
+
+// New provider to track palette display mode
+final paletteDisplayModeProvider = StateProvider<String>((ref) => 'normal');
