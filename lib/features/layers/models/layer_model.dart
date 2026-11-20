@@ -31,7 +31,7 @@ class Layer {
     bool? isLocked,
     String? type,
     List<String>? childLayerIds,
-    String? parentId,
+    String? parentId = _unspecified,
     BlendMode? blendMode,
   }) {
     return Layer(
@@ -42,10 +42,12 @@ class Layer {
       isLocked: isLocked ?? this.isLocked,
       type: type ?? this.type,
       childLayerIds: childLayerIds ?? this.childLayerIds,
-      parentId: parentId ?? this.parentId,
+      parentId: parentId == _unspecified ? this.parentId : parentId,
       blendMode: blendMode ?? this.blendMode,
     );
   }
+  
+  static const String _unspecified = '__unspecified__';
 }
 
 class LayerStack {

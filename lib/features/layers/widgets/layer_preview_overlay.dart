@@ -218,12 +218,17 @@ class LayerPreviewCard extends StatelessWidget {
                             ),
                           ),
                         )
-                      : CustomPaint(
-                          painter: LayerPreviewPainter(
-                            strokes: strokes,
-                            opacity: layer.opacity,
+                      : LayoutBuilder(
+                          builder: (context, constraints) => CustomPaint(
+                            painter: LayerPreviewPainter(
+                              strokes: strokes,
+                              opacity: layer.opacity,
+                            ),
+                            size: Size(
+                              constraints.maxWidth,
+                              constraints.maxHeight,
+                            ),
                           ),
-                          size: Size.infinite,
                         ),
                 ),
               ),

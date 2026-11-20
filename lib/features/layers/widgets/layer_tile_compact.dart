@@ -2,6 +2,13 @@ import 'package:flutter/material.dart';
 import '../models/layer_model.dart';
 import '../models/layer_canvas_model.dart';
 
+class LayerDragData {
+  final int index;
+  final bool isGrouped;
+  
+  LayerDragData({required this.index, required this.isGrouped});
+}
+
 class LayerTileCompact extends StatefulWidget {
   final Layer layer;
   final bool isActive;
@@ -18,6 +25,8 @@ class LayerTileCompact extends StatefulWidget {
   final VoidCallback onToggleExpand;
   final Function(Offset position, List<LayerStroke> strokes)? onLongPressStart;
   final VoidCallback? onLongPressEnd;
+  final VoidCallback? onDropToRoot;
+  final bool isDragOverRoot;
 
   const LayerTileCompact({
     super.key,
@@ -36,6 +45,8 @@ class LayerTileCompact extends StatefulWidget {
     required this.onToggleExpand,
     this.onLongPressStart,
     this.onLongPressEnd,
+    this.onDropToRoot,
+    this.isDragOverRoot = false,
   });
 
   @override
@@ -53,8 +64,11 @@ class _LayerTileCompactState extends State<LayerTileCompact> {
 
   @override
   Widget build(BuildContext context) {
-    return Draggable<int>(
-      data: widget.index,
+    return Draggable<LayerDragData>(
+      data: LayerDragData(
+        index: widget.index,
+        isGrouped: widget.layer.parentId != null && widget.layer.parentId!.isNotEmpty,
+      ),
       feedback: Material(
         color: Colors.transparent,
         child: Container(
@@ -84,20 +98,33 @@ class _LayerTileCompactState extends State<LayerTileCompact> {
           ),
         ),
       ),
-      child: DragTarget<int>(
+      child: DragTarget<LayerDragData>(
+        onWillAcceptWithDetails: (details) {
+          // Accept grouped layers only if dropping on a group
+          if (details.data.isGrouped) {
+            return widget.layer.type == 'group' && details.data.index != widget.index;
+          }
+          return true;
+        },
         onAcceptWithDetails: (details) {
-          final draggedLayerIndex = details.data;
+          final draggedLayerIndex = details.data.index;
           // If dropping on a group, add to group instead of reordering
           if (widget.layer.type == 'group' && draggedLayerIndex != widget.index) {
-            widget.onDropOnGroup?.call(draggedLayerIndex, widget.index);
+            // If dragged layer is grouped, use moveLayerBetweenGroups to handle both removal and addition
+            if (details.data.isGrouped) {
+              widget.onDropOnGroup?.call(draggedLayerIndex, widget.index);
+              // Note: The parent widget (layer_panel) needs to be updated to call moveLayerBetweenGroups
+            } else {
+              widget.onDropOnGroup?.call(draggedLayerIndex, widget.index);
+            }
           } else {
             widget.onReorder(draggedLayerIndex, widget.index);
           }
         },
         builder: (context, candidateData, rejectedData) {
           final isGroupTarget = widget.layer.type == 'group';
-          final shouldHighlightAsGroupTarget = candidateData.isNotEmpty && isGroupTarget;
-          final isDraggingOverLayer = candidateData.isNotEmpty;
+          final isDraggedOverThisLayer = candidateData.isNotEmpty;
+          final shouldHighlightAsGroupTarget = isDraggedOverThisLayer && isGroupTarget;
           
           return GestureDetector(
             onTap: widget.onTap,
@@ -123,17 +150,21 @@ class _LayerTileCompactState extends State<LayerTileCompact> {
                 color: widget.isActive
                     ? Colors.deepPurple.withValues(alpha: 0.4)
                     : (shouldHighlightAsGroupTarget
-                        ? Colors.amber.withValues(alpha: 0.6) // Brighter when valid drop target
-                        : (isDraggingOverLayer
-                            ? Colors.grey.withValues(alpha: 0.2)
-                            : Colors.transparent)),
+                        ? Colors.amber.withValues(alpha: 0.6)
+                        : (widget.isDragOverRoot && widget.isChild
+                            ? Colors.red.withValues(alpha: 0.4) // Red for ungroup target
+                            : (isDraggedOverThisLayer
+                                ? Colors.grey.withValues(alpha: 0.2)
+                                : Colors.transparent))),
                 border: Border.all(
                   color: widget.isActive
                       ? Colors.deepPurple
                       : (shouldHighlightAsGroupTarget
-                          ? Colors.amber // Bright amber for valid drop
-                          : Colors.transparent),
-                  width: shouldHighlightAsGroupTarget ? 2.5 : 1.5,
+                          ? Colors.amber
+                          : (widget.isDragOverRoot && widget.isChild
+                              ? Colors.red
+                              : Colors.transparent)),
+                  width: (shouldHighlightAsGroupTarget || (widget.isDragOverRoot && widget.isChild)) ? 2.5 : 1.5,
                 ),
                 borderRadius: BorderRadius.circular(3),
               ),
@@ -226,39 +257,6 @@ class _LayerTileCompactState extends State<LayerTileCompact> {
                       constraints: const BoxConstraints(),
                     ),
                   ),
-
-                  // Rename Button
-                  SizedBox(
-                    width: 20,
-                    height: 20,
-                    child: IconButton(
-                      icon: const Icon(
-                        Icons.edit,
-                        color: Colors.teal,
-                        size: 12,
-                      ),
-                      onPressed: widget.onRename,
-                      padding: EdgeInsets.zero,
-                      constraints: const BoxConstraints(),
-                    ),
-                  ),
-
-                  // Delete Button (only if not Background)
-                  if (widget.layer.name != 'Background')
-                    SizedBox(
-                      width: 20,
-                      height: 20,
-                      child: IconButton(
-                        icon: const Icon(
-                          Icons.close,
-                          color: Colors.red,
-                          size: 12,
-                        ),
-                        onPressed: widget.onDelete,
-                        padding: EdgeInsets.zero,
-                        constraints: const BoxConstraints(),
-                      ),
-                    ),
                 ],
               ),
             ),

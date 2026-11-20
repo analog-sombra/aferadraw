@@ -276,6 +276,54 @@ class LayerStackNotifier extends StateNotifier<LayerStack> {
     state = state.copyWith(layers: layers);
   }
 
+  /// Move a layer from one group to another group
+  /// If the layer is currently in a group, it removes it from the old group first
+  void moveLayerBetweenGroups(int layerIndex, int targetGroupIndex) {
+    if (layerIndex == targetGroupIndex) return;
+    if (layerIndex < 0 || layerIndex >= state.layers.length) return;
+    if (targetGroupIndex < 0 || targetGroupIndex >= state.layers.length) return;
+    
+    final targetGroup = state.layers[targetGroupIndex];
+    if (targetGroup.type != 'group') return; // Target must be a group
+    
+    final layers = [...state.layers];
+    final layerToMove = layers[layerIndex];
+    
+    // If layer is currently in a group, remove it from that group first
+    if (layerToMove.parentId != null && layerToMove.parentId!.isNotEmpty) {
+      int oldParentIndex = -1;
+      for (int i = 0; i < layers.length; i++) {
+        if (layers[i].id == layerToMove.parentId) {
+          oldParentIndex = i;
+          break;
+        }
+      }
+      
+      if (oldParentIndex != -1) {
+        final oldParentGroup = layers[oldParentIndex];
+        final updatedOldParent = oldParentGroup.copyWith(
+          childLayerIds: oldParentGroup.childLayerIds
+              .where((id) => id != layerToMove.id)
+              .toList(),
+        );
+        layers[oldParentIndex] = updatedOldParent;
+      }
+    }
+    
+    // Add to new group's children
+    final updatedTargetGroup = targetGroup.copyWith(
+      childLayerIds: [...targetGroup.childLayerIds, layerToMove.id],
+    );
+    
+    // Update layer with new parent reference
+    final updatedLayer = layerToMove.copyWith(parentId: targetGroup.id);
+    
+    layers[targetGroupIndex] = updatedTargetGroup;
+    layers[layerIndex] = updatedLayer;
+    
+    state = state.copyWith(layers: layers);
+  }
+
   /// Set blend mode for a layer
   void setBlendMode(int index, BlendMode blendMode) {
     if (index < 0 || index >= state.layers.length) return;
