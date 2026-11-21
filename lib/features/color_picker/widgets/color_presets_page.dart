@@ -4,7 +4,7 @@ import 'color_preset_selector.dart';
 import '../providers/color_picker_provider.dart';
 
 class ColorPresetsPage extends ConsumerWidget {
-  const ColorPresetsPage({Key? key}) : super(key: key);
+  const ColorPresetsPage({super.key});
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
@@ -24,15 +24,11 @@ class ColorPresetsPage extends ConsumerWidget {
                 onPresetSelected: (colors) {
                   // Handle preset selection
                   if (colors.isNotEmpty) {
-                    ref
-                        .read(colorPickerProvider.notifier)
-                        .setColor(colors[0]);
+                    ref.read(colorPickerProvider.notifier).setColor(colors[0]);
                   }
                 },
                 onColorSelected: (color) {
-                  ref
-                      .read(colorPickerProvider.notifier)
-                      .setColor(color);
+                  ref.read(colorPickerProvider.notifier).setColor(color);
                 },
               ),
             ],

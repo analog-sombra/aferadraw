@@ -502,9 +502,16 @@ class _ColorPickerPanelWidgetState extends ConsumerState<ColorPickerPanelWidget>
     WidgetRef ref,
     ColorPickerState colorState,
   ) {
+    // Only show custom palettes section if NO palette is currently selected
+    // If a palette is selected, it's displayed in the compact collapsible presets above
+    if (colorState.selectedPaletteName != null) {
+      return [];
+    }
+
     return colorState.customPalettes.entries.map((entry) {
       final paletteName = entry.key;
       final colors = entry.value;
+      final isSelected = colorState.selectedPaletteName == paletteName;
       final isExpanded =
           _paletteExpandedMap.putIfAbsent(paletteName, () => true);
 
@@ -532,9 +539,16 @@ class _ColorPickerPanelWidgetState extends ConsumerState<ColorPickerPanelWidget>
                       children: [
                         _colorButton(
                           color,
-                          () => ref
-                              .read(colorPickerProvider.notifier)
-                              .setColor(color),
+                          () {
+                            if (!isSelected) {
+                              ref
+                                  .read(colorPickerProvider.notifier)
+                                  .setSelectedPalette(paletteName);
+                            }
+                            ref
+                                .read(colorPickerProvider.notifier)
+                                .setColor(color);
+                          },
                         ),
                         GestureDetector(
                           onTap: () {

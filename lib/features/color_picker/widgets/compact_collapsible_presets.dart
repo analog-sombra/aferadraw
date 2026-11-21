@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import '../providers/color_presets_provider.dart';
+import '../providers/palette_state_provider.dart';
 import '../providers/color_picker_provider.dart';
 import '../screens/palette_selector_page.dart';
 
@@ -17,14 +17,8 @@ class CompactCollapsiblePresetsSelector extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final presets = ref.watch(colorPresetsProvider);
-    final selectedIndex = ref.watch(selectedPresetIndexProvider);
-    final selectedPreset = presets.isNotEmpty ? presets[selectedIndex] : null;
-    final colorState = ref.watch(colorPickerProvider);
-    final customPalettes = colorState.customPalettes;
-
-    final showAI = customPalettes.isNotEmpty;
-    final showNormal = selectedPreset != null && customPalettes.isEmpty;
+    final paletteState = ref.watch(paletteStateProvider);
+    final selectedPalette = paletteState.selectedPalette;
 
     return Container(
       margin: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
@@ -35,14 +29,14 @@ class CompactCollapsiblePresetsSelector extends ConsumerWidget {
       ),
       child: Column(
         children: [
-          // Header without Toggle Buttons
+          // Header
           Padding(
             padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
             child: Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
                 Text(
-                  showAI ? '✨ Palettes' : '🎨 Palettes',
+                  selectedPalette?.isAI == true ? '✨ Palettes' : '🎨 Palettes',
                   style: Theme.of(context).textTheme.titleSmall?.copyWith(
                         color: Colors.white,
                         fontWeight: FontWeight.w600,
@@ -77,158 +71,49 @@ class CompactCollapsiblePresetsSelector extends ConsumerWidget {
             ),
           ),
 
-          // Show ONLY AI Palettes
-          if (showAI)
+          // Show Selected Palette
+          if (selectedPalette != null)
             Padding(
               padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 10),
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  Text(
-                    '📌 My AI Palettes (${customPalettes.length})',
-                    style: TextStyle(
-                      color: Colors.cyan[400],
-                      fontSize: 11,
-                      fontWeight: FontWeight.w600,
-                      letterSpacing: 0.5,
-                    ),
-                  ),
-                  const SizedBox(height: 8),
-                  if (customPalettes.isEmpty)
-                    Text(
-                      'No AI palettes yet',
-                      style: TextStyle(
-                        color: Colors.grey[600],
-                        fontSize: 10,
-                      ),
-                    )
-                  else
-                    Wrap(
-                      spacing: 8,
-                      runSpacing: 8,
-                      children: customPalettes.entries.map((entry) {
-                        final paletteName = entry.key;
-                        final colors = entry.value;
-                        return Tooltip(
-                          message: paletteName,
-                          child: GestureDetector(
-                            onTap: () {
-                              if (colors.isNotEmpty) {
-                                ref
-                                    .read(colorPickerProvider.notifier)
-                                    .setColor(colors[0]);
-                              }
-                            },
-                            child: Container(
-                              padding: const EdgeInsets.symmetric(
-                                horizontal: 8,
-                                vertical: 6,
-                              ),
-                              decoration: BoxDecoration(
-                                color: Colors.grey[900],
-                                borderRadius: BorderRadius.circular(6),
-                                border: Border.all(
-                                  color: Colors.cyan[500]!,
-                                  width: 1.5,
-                                ),
-                                boxShadow: [
-                                  BoxShadow(
-                                    color: Colors.cyan[700]!.withOpacity(0.2),
-                                    blurRadius: 4,
-                                  )
-                                ],
-                              ),
-                              child: Row(
-                                mainAxisSize: MainAxisSize.min,
-                                children: [
-                                  Text(
-                                    paletteName,
-                                    style: TextStyle(
-                                      color: Colors.cyan[300],
-                                      fontSize: 10,
-                                      fontWeight: FontWeight.w500,
-                                    ),
-                                  ),
-                                  const SizedBox(width: 6),
-                                  for (int i = 0;
-                                      i < (colors.length > 5 ? 5 : colors.length);
-                                      i++)
-                                    Container(
-                                      width: 14,
-                                      height: 14,
-                                      margin: EdgeInsets.only(
-                                        right: i < (colors.length > 5 ? 4 : colors.length - 1)
-                                            ? 2
-                                            : 0,
-                                      ),
-                                      decoration: BoxDecoration(
-                                        color: colors[i],
-                                        borderRadius: BorderRadius.circular(2),
-                                        border: Border.all(
-                                          color: Colors.grey[800]!,
-                                          width: 0.5,
-                                        ),
-                                      ),
-                                    ),
-                                  if (colors.length > 5)
-                                    Text(
-                                      ' +${colors.length - 5}',
-                                      style: TextStyle(
-                                        color: Colors.cyan[300],
-                                        fontSize: 9,
-                                      ),
-                                    ),
-                                ],
-                              ),
-                            ),
-                          ),
-                        );
-                      }).toList(),
-                    ),
-                ],
-              ),
-            ),
-
-          // Show ONLY Normal Palettes
-          if (showNormal)
-            Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 10),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                    children: [
-                      Expanded(
-                        child: Text(
-                          selectedPreset.name,
-                          style: TextStyle(
-                            color: Colors.blue[400],
-                            fontSize: 11,
-                            fontWeight: FontWeight.w600,
-                            letterSpacing: 0.5,
-                          ),
-                          maxLines: 1,
-                          overflow: TextOverflow.ellipsis,
-                        ),
-                      ),
-                      Text(
-                        '(${selectedPreset.colors.length} colors)',
-                        style: TextStyle(
-                          color: Colors.grey[500],
-                          fontSize: 9,
-                        ),
-                      ),
-                    ],
-                  ),
-                  const SizedBox(height: 8),
+                  // Row(
+                  //   mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  //   children: [
+                  //     Expanded(
+                  //       child: Text(
+                  //         selectedPalette.name,
+                  //         style: TextStyle(
+                  //           color:
+                  //               selectedPalette.isAI
+                  //                   ? Colors.cyan[400]
+                  //                   : Colors.blue[400],
+                  //           fontSize: 11,
+                  //           fontWeight: FontWeight.w600,
+                  //           letterSpacing: 0.5,
+                  //         ),
+                  //         maxLines: 1,
+                  //         overflow: TextOverflow.ellipsis,
+                  //       ),
+                  //     ),
+                  //     Text(
+                  //       '(${selectedPalette.colors.length} colors)',
+                  //       style: TextStyle(
+                  //         color: Colors.grey[500],
+                  //         fontSize: 9,
+                  //       ),
+                  //     ),
+                  //   ],
+                  // ),
+                  // const SizedBox(height: 4),
                   Wrap(
                     spacing: 6,
                     runSpacing: 6,
                     children: List.generate(
-                      selectedPreset.colors.length,
+                      selectedPalette.colors.length,
                       (idx) {
-                        final color = selectedPreset.colors[idx];
+                        final color = selectedPalette.colors[idx];
                         return GestureDetector(
                           onTap: () {
                             ref
@@ -265,7 +150,7 @@ class CompactCollapsiblePresetsSelector extends ConsumerWidget {
             ),
 
           // Empty State Message
-          if (!showAI && !showNormal)
+          if (selectedPalette == null)
             Padding(
               padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 12),
               child: Column(
@@ -277,9 +162,7 @@ class CompactCollapsiblePresetsSelector extends ConsumerWidget {
                   ),
                   const SizedBox(height: 6),
                   Text(
-                    customPalettes.isEmpty
-                        ? 'Select from Browse to add AI Palettes'
-                        : 'Select a view mode above',
+                    'Browse to select a palette',
                     textAlign: TextAlign.center,
                     style: TextStyle(
                       color: Colors.grey[600],

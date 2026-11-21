@@ -10,6 +10,7 @@ class ColorPickerState {
   final List<Color> usedColors;
   final Map<String, List<Color>> customPalettes;
   final bool presetsExpanded;
+  final String? selectedPaletteName;
 
   ColorPickerState({
     this.selectedColor = const Color(0xFF000000),
@@ -20,6 +21,7 @@ class ColorPickerState {
     this.usedColors = const [],
     this.customPalettes = const {},
     this.presetsExpanded = true,
+    this.selectedPaletteName,
   });
 
   ColorPickerState copyWith({
@@ -31,6 +33,8 @@ class ColorPickerState {
     List<Color>? usedColors,
     Map<String, List<Color>>? customPalettes,
     bool? presetsExpanded,
+    String? selectedPaletteName,
+    bool clearSelectedPalette = false,
   }) {
     return ColorPickerState(
       selectedColor: selectedColor ?? this.selectedColor,
@@ -41,6 +45,7 @@ class ColorPickerState {
       usedColors: usedColors ?? this.usedColors,
       customPalettes: customPalettes ?? this.customPalettes,
       presetsExpanded: presetsExpanded ?? this.presetsExpanded,
+      selectedPaletteName: clearSelectedPalette ? null : (selectedPaletteName ?? this.selectedPaletteName),
     );
   }
 }
@@ -125,14 +130,44 @@ class ColorPickerNotifier extends StateNotifier<ColorPickerState> {
   void addCustomPalette(String name, List<Color> colors) {
     final palettes = Map<String, List<Color>>.from(state.customPalettes);
     palettes[name] = colors;
-    state = state.copyWith(customPalettes: palettes);
+    print('[DEBUG ColorPickerNotifier] addCustomPalette: name=$name, colorCount=${colors.length}');
+    state = state.copyWith(
+      customPalettes: palettes,
+      selectedPaletteName: name,
+    );
+    print('[DEBUG ColorPickerNotifier] state updated. selectedPaletteName=${state.selectedPaletteName}');
+  }
+
+  /// Set the currently selected palette to display
+  void setSelectedPalette(String? paletteName) {
+    state = state.copyWith(
+      selectedPaletteName: paletteName,
+      clearSelectedPalette: paletteName == null,
+    );
   }
 
   /// Remove custom palette
   void removeCustomPalette(String name) {
     final palettes = Map<String, List<Color>>.from(state.customPalettes);
     palettes.remove(name);
-    state = state.copyWith(customPalettes: palettes);
+    
+    String? newSelectedPalette = state.selectedPaletteName;
+    bool clearSelectedPalette = false;
+    
+    if (newSelectedPalette == name) {
+      if (palettes.isNotEmpty) {
+        newSelectedPalette = palettes.keys.first;
+      } else {
+        newSelectedPalette = null;
+        clearSelectedPalette = true;
+      }
+    }
+    
+    state = state.copyWith(
+      customPalettes: palettes,
+      selectedPaletteName: newSelectedPalette,
+      clearSelectedPalette: clearSelectedPalette,
+    );
   }
 
   /// Add current color to custom palette

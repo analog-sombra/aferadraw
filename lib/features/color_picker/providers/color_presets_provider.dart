@@ -7,7 +7,7 @@ class PresetProvider {
     final allPresetsData = _getAllPresetsData();
     
     for (int i = 0; i < allPresetsData.length; i++) {
-      final colors = allPresetsData[i] as List<String>;
+      final colors = allPresetsData[i];
       presets.add(
         ColorPreset.fromHexList(
           'Palette ${i + 1}',

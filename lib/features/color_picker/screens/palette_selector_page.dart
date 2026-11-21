@@ -3,7 +3,9 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../color_preset_model.dart';
 import '../providers/color_presets_provider.dart';
 import '../providers/color_picker_provider.dart';
+import '../providers/palette_state_provider.dart';
 import '../services/ai_color_api_service.dart';
+import 'package:logger/logger.dart';
 
 class PaletteSelectorPage extends ConsumerStatefulWidget {
   const PaletteSelectorPage({super.key});
@@ -51,15 +53,17 @@ class _PaletteSelectorPageState extends ConsumerState<PaletteSelectorPage>
   }
 
   void _selectPalette(int paletteIndex, ColorPreset preset) {
-    ref.read(selectedPresetIndexProvider.notifier).state = paletteIndex;
+    // Use simple palette state provider
+    ref.read(paletteStateProvider.notifier).selectPalette(
+          preset.name,
+          preset.colors,
+          isAI: false,
+        );
+    
+    // Set the first color in color picker
     if (preset.colors.isNotEmpty) {
       ref.read(colorPickerProvider.notifier).setColor(preset.colors[0]);
     }
-    Navigator.of(context).pop();
-  }
-
-  void _selectApiColor(Color color) {
-    ref.read(colorPickerProvider.notifier).setColor(color);
     Navigator.of(context).pop();
   }
 
@@ -68,10 +72,12 @@ class _PaletteSelectorPageState extends ConsumerState<PaletteSelectorPage>
     final colors =
         palette.colors.map((hexColor) => _parseColor(hexColor)).toList();
 
-    // Add to custom palettes
-    ref
-        .read(colorPickerProvider.notifier)
-        .addCustomPalette(palette.name, colors);
+    // Use simple palette state provider for AI palette
+    ref.read(paletteStateProvider.notifier).selectPalette(
+          palette.name,
+          colors,
+          isAI: true,
+        );
 
     // Select first color
     if (colors.isNotEmpty) {
@@ -208,6 +214,7 @@ class _PaletteSelectorPageState extends ConsumerState<PaletteSelectorPage>
                     final isSelected = paletteIdx == selectedIndex;
 
                     return GestureDetector(
+                      behavior: HitTestBehavior.opaque,
                       onTap: () => _selectPalette(paletteIdx, preset),
                       child: Container(
                         decoration: BoxDecoration(
@@ -259,30 +266,20 @@ class _PaletteSelectorPageState extends ConsumerState<PaletteSelectorPage>
                                     preset.colors.length,
                                     (colorIdx) {
                                       return Expanded(
-                                        child: GestureDetector(
-                                          onTap: () {
-                                            _selectPalette(paletteIdx, preset);
-                                            ref
-                                                .read(colorPickerProvider
-                                                    .notifier)
-                                                .setColor(
-                                                    preset.colors[colorIdx]);
-                                          },
-                                          child: Tooltip(
-                                            message: _colorToHex(
-                                                preset.colors[colorIdx]),
-                                            child: Container(
-                                              margin: EdgeInsets.only(
-                                                right: colorIdx <
-                                                        preset.colors.length - 1
-                                                    ? 2
-                                                    : 0,
-                                              ),
-                                              decoration: BoxDecoration(
-                                                color: preset.colors[colorIdx],
-                                                borderRadius:
-                                                    BorderRadius.circular(2),
-                                              ),
+                                        child: Tooltip(
+                                          message: _colorToHex(
+                                              preset.colors[colorIdx]),
+                                          child: Container(
+                                            margin: EdgeInsets.only(
+                                              right: colorIdx <
+                                                      preset.colors.length - 1
+                                                  ? 2
+                                                  : 0,
+                                            ),
+                                            decoration: BoxDecoration(
+                                              color: preset.colors[colorIdx],
+                                              borderRadius:
+                                                  BorderRadius.circular(2),
                                             ),
                                           ),
                                         ),
@@ -311,115 +308,106 @@ class _PaletteSelectorPageState extends ConsumerState<PaletteSelectorPage>
           padding: const EdgeInsets.all(12),
           child: Column(
             children: [
-              TextField(
-                onChanged: (value) {
-                  ref.read(apiPaletteSearchProvider.notifier).state = value;
-                  ref.read(apiPalettePageProvider.notifier).state = 1;
-                },
-                style: const TextStyle(color: Colors.white, fontSize: 13),
-                decoration: InputDecoration(
-                  hintText: 'Search AI Color palettes...',
-                  hintStyle: const TextStyle(color: Colors.grey, fontSize: 13),
-                  prefixIcon:
-                      const Icon(Icons.search, color: Colors.grey, size: 18),
-                  filled: true,
-                  fillColor: Colors.grey[900],
-                  contentPadding:
-                      const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
-                  border: OutlineInputBorder(
-                    borderRadius: BorderRadius.circular(6),
-                    borderSide: BorderSide(color: Colors.grey[700]!, width: 1),
-                  ),
-                  enabledBorder: OutlineInputBorder(
-                    borderRadius: BorderRadius.circular(6),
-                    borderSide: BorderSide(color: Colors.grey[700]!, width: 1),
-                  ),
-                  focusedBorder: OutlineInputBorder(
-                    borderRadius: BorderRadius.circular(6),
-                    borderSide:
-                        const BorderSide(color: Colors.blue, width: 1.5),
-                  ),
-                ),
-              ),
-              const SizedBox(height: 10),
-              // Sort dropdown
               Row(
                 children: [
-                  const Text(
-                    'Sort by:',
-                    style: TextStyle(
-                      color: Colors.white,
-                      fontSize: 12,
+                  Expanded(
+                    child: TextField(
+                      onChanged: (value) {
+                        ref.read(apiPaletteSearchProvider.notifier).state = value;
+                        ref.read(apiPalettePageProvider.notifier).state = 1;
+                      },
+                      style: const TextStyle(color: Colors.white, fontSize: 13),
+                      decoration: InputDecoration(
+                        hintText: 'Search AI Color palettes...',
+                        hintStyle: const TextStyle(color: Colors.grey, fontSize: 13),
+                        prefixIcon:
+                            const Icon(Icons.search, color: Colors.grey, size: 18),
+                        filled: true,
+                        fillColor: Colors.grey[900],
+                        contentPadding:
+                            const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
+                        border: OutlineInputBorder(
+                          borderRadius: BorderRadius.circular(6),
+                          borderSide: BorderSide(color: Colors.grey[700]!, width: 1),
+                        ),
+                        enabledBorder: OutlineInputBorder(
+                          borderRadius: BorderRadius.circular(6),
+                          borderSide: BorderSide(color: Colors.grey[700]!, width: 1),
+                        ),
+                        focusedBorder: OutlineInputBorder(
+                          borderRadius: BorderRadius.circular(6),
+                          borderSide:
+                              const BorderSide(color: Colors.blue, width: 1.5),
+                        ),
+                      ),
                     ),
                   ),
                   const SizedBox(width: 10),
-                  Expanded(
-                    child: Container(
-                      decoration: BoxDecoration(
-                        color: Colors.grey[900],
-                        borderRadius: BorderRadius.circular(6),
-                        border: Border.all(
-                          color: Colors.grey[700]!,
-                          width: 1,
+                  // Sort dropdown (compact, no label)
+                  Container(
+                    decoration: BoxDecoration(
+                      color: Colors.grey[900],
+                      borderRadius: BorderRadius.circular(6),
+                      border: Border.all(
+                        color: Colors.grey[700]!,
+                        width: 1,
+                      ),
+                    ),
+                    child: DropdownButton<String>(
+                      underline: const SizedBox(),
+                      dropdownColor: Colors.grey[850],
+                      value: ref.watch(apiPaletteSortProvider),
+                      items: const [
+                        DropdownMenuItem(
+                          value: 'popular',
+                          child: Padding(
+                            padding: EdgeInsets.symmetric(
+                                horizontal: 12, vertical: 8),
+                            child: Text(
+                              'Popular',
+                              style: TextStyle(
+                                color: Colors.white,
+                                fontSize: 12,
+                              ),
+                            ),
+                          ),
                         ),
-                      ),
-                      child: DropdownButton<String>(
-                        isExpanded: true,
-                        underline: const SizedBox(),
-                        dropdownColor: Colors.grey[850],
-                        value: ref.watch(apiPaletteSortProvider),
-                        items: const [
-                          DropdownMenuItem(
-                            value: 'popular',
-                            child: Padding(
-                              padding: EdgeInsets.symmetric(
-                                  horizontal: 12, vertical: 8),
-                              child: Text(
-                                'Popular',
-                                style: TextStyle(
-                                  color: Colors.white,
-                                  fontSize: 12,
-                                ),
+                        DropdownMenuItem(
+                          value: 'trending',
+                          child: Padding(
+                            padding: EdgeInsets.symmetric(
+                                horizontal: 12, vertical: 8),
+                            child: Text(
+                              'Trending',
+                              style: TextStyle(
+                                color: Colors.white,
+                                fontSize: 12,
                               ),
                             ),
                           ),
-                          DropdownMenuItem(
-                            value: 'trending',
-                            child: Padding(
-                              padding: EdgeInsets.symmetric(
-                                  horizontal: 12, vertical: 8),
-                              child: Text(
-                                'Trending',
-                                style: TextStyle(
-                                  color: Colors.white,
-                                  fontSize: 12,
-                                ),
+                        ),
+                        DropdownMenuItem(
+                          value: 'newest',
+                          child: Padding(
+                            padding: EdgeInsets.symmetric(
+                                horizontal: 12, vertical: 8),
+                            child: Text(
+                              'Newest',
+                              style: TextStyle(
+                                color: Colors.white,
+                                fontSize: 12,
                               ),
                             ),
                           ),
-                          DropdownMenuItem(
-                            value: 'newest',
-                            child: Padding(
-                              padding: EdgeInsets.symmetric(
-                                  horizontal: 12, vertical: 8),
-                              child: Text(
-                                'Newest',
-                                style: TextStyle(
-                                  color: Colors.white,
-                                  fontSize: 12,
-                                ),
-                              ),
-                            ),
-                          ),
-                        ],
-                        onChanged: (value) {
-                          if (value != null) {
-                            ref.read(apiPaletteSortProvider.notifier).state =
-                                value;
-                            ref.read(apiPalettePageProvider.notifier).state = 1;
-                          }
-                        },
-                      ),
+                        ),
+                      ],
+                      onChanged: (value) {
+                        if (value != null) {
+                          ref.read(apiPaletteSortProvider.notifier).state =
+                              value;
+                          ref.read(apiPalettePageProvider.notifier).state = 1;
+                        }
+                      },
                     ),
                   ),
                 ],
@@ -503,17 +491,6 @@ class _PaletteSelectorPageState extends ConsumerState<PaletteSelectorPage>
       ),
       data: (response) => Column(
         children: [
-          // Info text
-          Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
-            child: Text(
-              'Showing ${response.data.length} of ${response.total} palettes (Page ${response.page}/${response.totalPages})',
-              style: TextStyle(
-                color: Colors.grey[600],
-                fontSize: 11,
-              ),
-            ),
-          ),
           // Grid
           Expanded(
             child: response.data.isEmpty
@@ -550,11 +527,13 @@ class _PaletteSelectorPageState extends ConsumerState<PaletteSelectorPage>
                     itemBuilder: (context, idx) {
                       final palette = response.data[idx];
                       // log the palette
-                      print(
-                          '🎨 PaletteSelectorPage - palette: ${palette.name}');
 
                       return GestureDetector(
+                        behavior: HitTestBehavior.opaque,
                         onTap: () {
+                          print('[DEBUG] Palette selected: ${palette.name}');
+                          var logger = Logger();
+                          logger.d("Selected palette: ${palette.name}");
                           _selectApiPalette(palette);
                         },
                         child: Container(
@@ -640,26 +619,20 @@ class _PaletteSelectorPageState extends ConsumerState<PaletteSelectorPage>
                                         final color = _parseColor(
                                             palette.colors[colorIdx]);
                                         return Expanded(
-                                          child: GestureDetector(
-                                            onTap: () {
-                                              _selectApiColor(color);
-                                            },
-                                            child: Tooltip(
-                                              message: palette.colors[colorIdx],
-                                              child: Container(
-                                                margin: EdgeInsets.only(
-                                                  right: colorIdx <
-                                                          palette.colors
-                                                                  .length -
-                                                              1
-                                                      ? 2
-                                                      : 0,
-                                                ),
-                                                decoration: BoxDecoration(
-                                                  color: color,
-                                                  borderRadius:
-                                                      BorderRadius.circular(2),
-                                                ),
+                                          child: Tooltip(
+                                            message: palette.colors[colorIdx],
+                                            child: Container(
+                                              margin: EdgeInsets.only(
+                                                right: colorIdx <
+                                                        palette.colors.length -
+                                                            1
+                                                    ? 2
+                                                    : 0,
+                                              ),
+                                              decoration: BoxDecoration(
+                                                color: color,
+                                                borderRadius:
+                                                    BorderRadius.circular(2),
                                               ),
                                             ),
                                           ),
@@ -707,7 +680,7 @@ class _PaletteSelectorPageState extends ConsumerState<PaletteSelectorPage>
                     },
                   ),
           ),
-          // Pagination
+          // Pagination with info text
           if (response.totalPages > 1)
             Padding(
               padding: const EdgeInsets.all(12),
@@ -723,11 +696,33 @@ class _PaletteSelectorPageState extends ConsumerState<PaletteSelectorPage>
                     child: const Text('← Previous'),
                   ),
                   const SizedBox(width: 12),
-                  Text(
-                    'Page $page of ${response.totalPages}',
-                    style: const TextStyle(
-                      color: Colors.white,
-                      fontSize: 12,
+                  Container(
+                    padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+                    decoration: BoxDecoration(
+                      color: Colors.grey[850],
+                      borderRadius: BorderRadius.circular(6),
+                      border: Border.all(color: Colors.grey[700]!, width: 1),
+                    ),
+                    child: Column(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        Text(
+                          'Showing ${response.data.length} of ${response.total}',
+                          style: TextStyle(
+                            color: Colors.grey[400],
+                            fontSize: 11,
+                            fontWeight: FontWeight.w500,
+                          ),
+                        ),
+                        Text(
+                          'Page $page of ${response.totalPages}',
+                          style: const TextStyle(
+                            color: Colors.white,
+                            fontSize: 12,
+                            fontWeight: FontWeight.w600,
+                          ),
+                        ),
+                      ],
                     ),
                   ),
                   const SizedBox(width: 12),
