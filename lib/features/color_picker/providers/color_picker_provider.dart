@@ -1,5 +1,5 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:flutter/material.dart';
+import 'package:material_ui/material_ui.dart';
 
 class ColorPickerState {
   final Color selectedColor;
@@ -45,7 +45,9 @@ class ColorPickerState {
       usedColors: usedColors ?? this.usedColors,
       customPalettes: customPalettes ?? this.customPalettes,
       presetsExpanded: presetsExpanded ?? this.presetsExpanded,
-      selectedPaletteName: clearSelectedPalette ? null : (selectedPaletteName ?? this.selectedPaletteName),
+      selectedPaletteName: clearSelectedPalette
+          ? null
+          : (selectedPaletteName ?? this.selectedPaletteName),
     );
   }
 }
@@ -130,12 +132,14 @@ class ColorPickerNotifier extends StateNotifier<ColorPickerState> {
   void addCustomPalette(String name, List<Color> colors) {
     final palettes = Map<String, List<Color>>.from(state.customPalettes);
     palettes[name] = colors;
-    print('[DEBUG ColorPickerNotifier] addCustomPalette: name=$name, colorCount=${colors.length}');
+    print(
+        '[DEBUG ColorPickerNotifier] addCustomPalette: name=$name, colorCount=${colors.length}');
     state = state.copyWith(
       customPalettes: palettes,
       selectedPaletteName: name,
     );
-    print('[DEBUG ColorPickerNotifier] state updated. selectedPaletteName=${state.selectedPaletteName}');
+    print(
+        '[DEBUG ColorPickerNotifier] state updated. selectedPaletteName=${state.selectedPaletteName}');
   }
 
   /// Set the currently selected palette to display
@@ -150,10 +154,10 @@ class ColorPickerNotifier extends StateNotifier<ColorPickerState> {
   void removeCustomPalette(String name) {
     final palettes = Map<String, List<Color>>.from(state.customPalettes);
     palettes.remove(name);
-    
+
     String? newSelectedPalette = state.selectedPaletteName;
     bool clearSelectedPalette = false;
-    
+
     if (newSelectedPalette == name) {
       if (palettes.isNotEmpty) {
         newSelectedPalette = palettes.keys.first;
@@ -162,7 +166,7 @@ class ColorPickerNotifier extends StateNotifier<ColorPickerState> {
         clearSelectedPalette = true;
       }
     }
-    
+
     state = state.copyWith(
       customPalettes: palettes,
       selectedPaletteName: newSelectedPalette,

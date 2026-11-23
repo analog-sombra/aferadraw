@@ -1,11 +1,11 @@
-import 'package:flutter/material.dart';
+import 'package:material_ui/material_ui.dart';
 import '../models/layer_model.dart';
 import '../models/layer_canvas_model.dart';
 
 class LayerDragData {
   final int index;
   final bool isGrouped;
-  
+
   LayerDragData({required this.index, required this.isGrouped});
 }
 
@@ -67,7 +67,8 @@ class _LayerTileCompactState extends State<LayerTileCompact> {
     return Draggable<LayerDragData>(
       data: LayerDragData(
         index: widget.index,
-        isGrouped: widget.layer.parentId != null && widget.layer.parentId!.isNotEmpty,
+        isGrouped:
+            widget.layer.parentId != null && widget.layer.parentId!.isNotEmpty,
       ),
       feedback: Material(
         color: Colors.transparent,
@@ -102,14 +103,16 @@ class _LayerTileCompactState extends State<LayerTileCompact> {
         onWillAcceptWithDetails: (details) {
           // Accept grouped layers only if dropping on a group
           if (details.data.isGrouped) {
-            return widget.layer.type == 'group' && details.data.index != widget.index;
+            return widget.layer.type == 'group' &&
+                details.data.index != widget.index;
           }
           return true;
         },
         onAcceptWithDetails: (details) {
           final draggedLayerIndex = details.data.index;
           // If dropping on a group, add to group instead of reordering
-          if (widget.layer.type == 'group' && draggedLayerIndex != widget.index) {
+          if (widget.layer.type == 'group' &&
+              draggedLayerIndex != widget.index) {
             // If dragged layer is grouped, use moveLayerBetweenGroups to handle both removal and addition
             if (details.data.isGrouped) {
               widget.onDropOnGroup?.call(draggedLayerIndex, widget.index);
@@ -124,12 +127,14 @@ class _LayerTileCompactState extends State<LayerTileCompact> {
         builder: (context, candidateData, rejectedData) {
           final isGroupTarget = widget.layer.type == 'group';
           final isDraggedOverThisLayer = candidateData.isNotEmpty;
-          final shouldHighlightAsGroupTarget = isDraggedOverThisLayer && isGroupTarget;
-          
+          final shouldHighlightAsGroupTarget =
+              isDraggedOverThisLayer && isGroupTarget;
+
           return GestureDetector(
             onTap: widget.onTap,
             onLongPressStart: (details) {
-              if (widget.onLongPressStart != null && widget.layer.type != 'group') {
+              if (widget.onLongPressStart != null &&
+                  widget.layer.type != 'group') {
                 widget.onLongPressStart!(details.globalPosition, []);
               }
             },
@@ -152,7 +157,8 @@ class _LayerTileCompactState extends State<LayerTileCompact> {
                     : (shouldHighlightAsGroupTarget
                         ? Colors.amber.withValues(alpha: 0.6)
                         : (widget.isDragOverRoot && widget.isChild
-                            ? Colors.red.withValues(alpha: 0.4) // Red for ungroup target
+                            ? Colors.red.withValues(
+                                alpha: 0.4) // Red for ungroup target
                             : (isDraggedOverThisLayer
                                 ? Colors.grey.withValues(alpha: 0.2)
                                 : Colors.transparent))),
@@ -164,7 +170,10 @@ class _LayerTileCompactState extends State<LayerTileCompact> {
                           : (widget.isDragOverRoot && widget.isChild
                               ? Colors.red
                               : Colors.transparent)),
-                  width: (shouldHighlightAsGroupTarget || (widget.isDragOverRoot && widget.isChild)) ? 2.5 : 1.5,
+                  width: (shouldHighlightAsGroupTarget ||
+                          (widget.isDragOverRoot && widget.isChild))
+                      ? 2.5
+                      : 1.5,
                 ),
                 borderRadius: BorderRadius.circular(3),
               ),
@@ -178,9 +187,7 @@ class _LayerTileCompactState extends State<LayerTileCompact> {
                       height: 20,
                       child: IconButton(
                         icon: Icon(
-                          _isExpanded
-                              ? Icons.expand_less
-                              : Icons.expand_more,
+                          _isExpanded ? Icons.expand_less : Icons.expand_more,
                           color: Colors.amber,
                           size: 12,
                         ),
@@ -266,4 +273,3 @@ class _LayerTileCompactState extends State<LayerTileCompact> {
     );
   }
 }
-

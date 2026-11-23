@@ -1,4 +1,4 @@
-import 'package:flutter/material.dart';
+import 'package:material_ui/material_ui.dart';
 import '../models/drawing_models.dart';
 
 class DrawingPainter extends CustomPainter {
@@ -28,7 +28,7 @@ class DrawingPainter extends CustomPainter {
       } else {
         // Apply layer opacity to stroke color
         final paint = Paint()
-          ..color = Colors.black.withOpacity(activeLayerOpacity)
+          ..color = Colors.black.withValues(alpha: activeLayerOpacity)
           ..strokeWidth = line.strokeWidth
           ..strokeCap = StrokeCap.round
           ..strokeJoin = StrokeJoin.round;

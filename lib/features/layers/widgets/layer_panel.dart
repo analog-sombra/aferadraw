@@ -1,4 +1,4 @@
-import 'package:flutter/material.dart';
+import 'package:material_ui/material_ui.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../providers/layer_provider.dart';
 import '../models/layer_model.dart';
@@ -91,7 +91,7 @@ class _LayerPanelWidgetState extends ConsumerState<LayerPanelWidget> {
   /// Flatten tree for display
   List<MapEntry<_LayerTreeNode, int>> _flattenTree(List<_LayerTreeNode> nodes) {
     final result = <MapEntry<_LayerTreeNode, int>>[];
-    
+
     void traverse(List<_LayerTreeNode> nodeList) {
       for (final node in nodeList) {
         result.add(MapEntry(node, node.depth));
@@ -161,7 +161,8 @@ class _LayerPanelWidgetState extends ConsumerState<LayerPanelWidget> {
     );
   }
 
-  Widget _buildLayerTreeView(LayerStack layerStack, LayerStackNotifier notifier) {
+  Widget _buildLayerTreeView(
+      LayerStack layerStack, LayerStackNotifier notifier) {
     final treeRoots = _buildLayerHierarchy(layerStack);
     final flatList = _flattenTree(treeRoots);
 
@@ -169,7 +170,7 @@ class _LayerPanelWidgetState extends ConsumerState<LayerPanelWidget> {
       onWillAcceptWithDetails: (details) {
         final draggedIndex = details.data.index;
         final isGrouped = details.data.isGrouped;
-        
+
         if (draggedIndex >= 0 && draggedIndex < layerStack.layers.length) {
           // Show RED highlight if layer is grouped (has a parent)
           if (isGrouped != _dragOverRoot) {
@@ -186,7 +187,8 @@ class _LayerPanelWidgetState extends ConsumerState<LayerPanelWidget> {
         if (draggedIndex >= 0 && draggedIndex < layerStack.layers.length) {
           final draggedLayer = layerStack.layers[draggedIndex];
           // Remove from group if it has a parent
-          if (draggedLayer.parentId != null && draggedLayer.parentId!.isNotEmpty) {
+          if (draggedLayer.parentId != null &&
+              draggedLayer.parentId!.isNotEmpty) {
             notifier.removeLayerFromGroup(draggedIndex);
           }
         }
@@ -250,7 +252,8 @@ class _LayerPanelWidgetState extends ConsumerState<LayerPanelWidget> {
                       isChild: depth > 0,
                       isDragOverRoot: _dragOverRoot && depth > 0,
                       onTap: () => notifier.selectLayer(layerIndex),
-                      onVisibilityToggle: () => notifier.toggleVisibility(layerIndex),
+                      onVisibilityToggle: () =>
+                          notifier.toggleVisibility(layerIndex),
                       onLockToggle: () => notifier.toggleLock(layerIndex),
                       onDelete: () => _showDeleteConfirm(
                         context,
@@ -267,8 +270,10 @@ class _LayerPanelWidgetState extends ConsumerState<LayerPanelWidget> {
                       onDropOnGroup: (draggedIndex, groupIndex) {
                         final draggedLayer = layerStack.layers[draggedIndex];
                         // If dragged layer is already in a group, move it between groups
-                        if (draggedLayer.parentId != null && draggedLayer.parentId!.isNotEmpty) {
-                          notifier.moveLayerBetweenGroups(draggedIndex, groupIndex);
+                        if (draggedLayer.parentId != null &&
+                            draggedLayer.parentId!.isNotEmpty) {
+                          notifier.moveLayerBetweenGroups(
+                              draggedIndex, groupIndex);
                         } else {
                           // Otherwise, just add it to the group
                           notifier.addLayerToGroup(draggedIndex, groupIndex);
@@ -279,7 +284,8 @@ class _LayerPanelWidgetState extends ConsumerState<LayerPanelWidget> {
                       },
                       onToggleExpand: () {
                         setState(() {
-                          _expandedGroups[layer.id] = !(_expandedGroups[layer.id] ?? true);
+                          _expandedGroups[layer.id] =
+                              !(_expandedGroups[layer.id] ?? true);
                         });
                       },
                       onLongPressStart: (position, strokes) {
@@ -569,7 +575,8 @@ class _LayerPanelWidgetState extends ConsumerState<LayerPanelWidget> {
                             top: 10,
                             right: 6,
                             width: 120,
-                            child: _buildPreviewCard(drawingProvider, layerStack),
+                            child:
+                                _buildPreviewCard(drawingProvider, layerStack),
                           ),
                       ],
                     ),
@@ -632,8 +639,8 @@ class _LayerPanelWidgetState extends ConsumerState<LayerPanelWidget> {
                       Tooltip(
                         message: 'Add Layer',
                         child: IconButton(
-                          onPressed: () => notifier
-                              .addBasicLayer('Layer ${layerStack.layers.length}'),
+                          onPressed: () => notifier.addBasicLayer(
+                              'Layer ${layerStack.layers.length}'),
                           icon: const Icon(Icons.add_box_outlined,
                               color: Colors.teal, size: 18),
                           padding: EdgeInsets.zero,
@@ -644,8 +651,8 @@ class _LayerPanelWidgetState extends ConsumerState<LayerPanelWidget> {
                       Tooltip(
                         message: 'Add Group',
                         child: IconButton(
-                          onPressed: () => notifier
-                              .addGroupLayer('Group ${layerStack.layers.length}'),
+                          onPressed: () => notifier.addGroupLayer(
+                              'Group ${layerStack.layers.length}'),
                           icon: const Icon(Icons.create_new_folder_outlined,
                               color: Colors.deepPurple, size: 18),
                           padding: EdgeInsets.zero,
@@ -654,7 +661,7 @@ class _LayerPanelWidgetState extends ConsumerState<LayerPanelWidget> {
                       ),
                     ],
                   ),
-                  
+
                   // RIGHT SIDE: Rename and Delete buttons (only if layer is selected and not Background)
                   if (activeLayer != null && activeLayer.name != 'Background')
                     Row(
@@ -689,7 +696,8 @@ class _LayerPanelWidgetState extends ConsumerState<LayerPanelWidget> {
                             onPressed: () => _showDeleteConfirm(
                               context,
                               activeLayer.name,
-                              () => notifier.deleteLayer(layerStack.activeLayerIndex),
+                              () => notifier
+                                  .deleteLayer(layerStack.activeLayerIndex),
                             ),
                             padding: EdgeInsets.zero,
                             constraints: const BoxConstraints(),

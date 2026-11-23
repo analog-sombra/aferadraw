@@ -1,4 +1,4 @@
-import 'package:flutter/material.dart';
+import 'package:material_ui/material_ui.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../providers/color_picker_provider.dart';
 import 'compact_collapsible_presets.dart';
@@ -14,10 +14,12 @@ class ColorPickerPanelWidget extends ConsumerStatefulWidget {
   });
 
   @override
-  ConsumerState<ColorPickerPanelWidget> createState() => _ColorPickerPanelWidgetState();
+  ConsumerState<ColorPickerPanelWidget> createState() =>
+      _ColorPickerPanelWidgetState();
 }
 
-class _ColorPickerPanelWidgetState extends ConsumerState<ColorPickerPanelWidget> {
+class _ColorPickerPanelWidgetState
+    extends ConsumerState<ColorPickerPanelWidget> {
   final TextEditingController _paletteNameController = TextEditingController();
   final Map<String, bool> _paletteExpandedMap = {};
 
@@ -87,7 +89,8 @@ class _ColorPickerPanelWidgetState extends ConsumerState<ColorPickerPanelWidget>
 
                     // Hue Slider
                     Padding(
-                      padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 12),
+                      padding: const EdgeInsets.symmetric(
+                          horizontal: 12, vertical: 12),
                       child: Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
@@ -109,14 +112,15 @@ class _ColorPickerPanelWidgetState extends ConsumerState<ColorPickerPanelWidget>
                                 end: Alignment.centerRight,
                                 colors: List<Color>.generate(
                                   360,
-                                  (index) =>
-                                      HSVColor.fromAHSV(1, index.toDouble(), 1, 1)
-                                          .toColor(),
+                                  (index) => HSVColor.fromAHSV(
+                                          1, index.toDouble(), 1, 1)
+                                      .toColor(),
                                 ),
                               ),
                             ),
                             child: Padding(
-                              padding: const EdgeInsets.symmetric(horizontal: 8),
+                              padding:
+                                  const EdgeInsets.symmetric(horizontal: 8),
                               child: SliderTheme(
                                 data: SliderThemeData(
                                   trackHeight: 24,
@@ -149,7 +153,8 @@ class _ColorPickerPanelWidgetState extends ConsumerState<ColorPickerPanelWidget>
 
                     // Color Picker Gradient
                     Padding(
-                      padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+                      padding: const EdgeInsets.symmetric(
+                          horizontal: 12, vertical: 8),
                       child: Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
@@ -177,7 +182,8 @@ class _ColorPickerPanelWidgetState extends ConsumerState<ColorPickerPanelWidget>
 
                     // Saturation Slider
                     Padding(
-                      padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+                      padding: const EdgeInsets.symmetric(
+                          horizontal: 12, vertical: 8),
                       child: Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
@@ -198,15 +204,18 @@ class _ColorPickerPanelWidgetState extends ConsumerState<ColorPickerPanelWidget>
                                 begin: Alignment.centerLeft,
                                 end: Alignment.centerRight,
                                 colors: [
-                                  HSVColor.fromAHSV(1, colorState.hue, 0, colorState.value)
+                                  HSVColor.fromAHSV(1, colorState.hue, 0,
+                                          colorState.value)
                                       .toColor(),
-                                  HSVColor.fromAHSV(1, colorState.hue, 1, colorState.value)
+                                  HSVColor.fromAHSV(1, colorState.hue, 1,
+                                          colorState.value)
                                       .toColor(),
                                 ],
                               ),
                             ),
                             child: Padding(
-                              padding: const EdgeInsets.symmetric(horizontal: 6),
+                              padding:
+                                  const EdgeInsets.symmetric(horizontal: 6),
                               child: SliderTheme(
                                 data: SliderThemeData(
                                   trackHeight: 20,
@@ -239,7 +248,8 @@ class _ColorPickerPanelWidgetState extends ConsumerState<ColorPickerPanelWidget>
 
                     // Brightness/Value Slider
                     Padding(
-                      padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+                      padding: const EdgeInsets.symmetric(
+                          horizontal: 12, vertical: 8),
                       child: Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
@@ -261,13 +271,15 @@ class _ColorPickerPanelWidgetState extends ConsumerState<ColorPickerPanelWidget>
                                 end: Alignment.centerRight,
                                 colors: [
                                   Colors.black,
-                                  HSVColor.fromAHSV(1, colorState.hue, colorState.saturation, 1)
+                                  HSVColor.fromAHSV(1, colorState.hue,
+                                          colorState.saturation, 1)
                                       .toColor(),
                                 ],
                               ),
                             ),
                             child: Padding(
-                              padding: const EdgeInsets.symmetric(horizontal: 6),
+                              padding:
+                                  const EdgeInsets.symmetric(horizontal: 6),
                               child: SliderTheme(
                                 data: SliderThemeData(
                                   trackHeight: 20,
@@ -300,7 +312,8 @@ class _ColorPickerPanelWidgetState extends ConsumerState<ColorPickerPanelWidget>
 
                     // Current Color Display
                     Padding(
-                      padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 12),
+                      padding: const EdgeInsets.symmetric(
+                          horizontal: 12, vertical: 12),
                       child: Container(
                         width: double.infinity,
                         height: 40,
@@ -399,7 +412,8 @@ class _ColorPickerPanelWidgetState extends ConsumerState<ColorPickerPanelWidget>
 
                     // Create Palette Button
                     Padding(
-                      padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+                      padding: const EdgeInsets.symmetric(
+                          horizontal: 12, vertical: 8),
                       child: _buildPaletteButton(
                         icon: Icons.add,
                         label: 'Create Palette',
@@ -411,7 +425,8 @@ class _ColorPickerPanelWidgetState extends ConsumerState<ColorPickerPanelWidget>
                     // Add to Palette Button
                     if (colorState.customPalettes.isNotEmpty)
                       Padding(
-                        padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 4),
+                        padding: const EdgeInsets.symmetric(
+                            horizontal: 12, vertical: 4),
                         child: _buildPaletteButton(
                           icon: Icons.bookmark_add,
                           label: 'Add to Palette',
@@ -422,7 +437,8 @@ class _ColorPickerPanelWidgetState extends ConsumerState<ColorPickerPanelWidget>
 
                     // Reset Button
                     Padding(
-                      padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+                      padding: const EdgeInsets.symmetric(
+                          horizontal: 12, vertical: 8),
                       child: _buildPaletteButton(
                         icon: Icons.refresh,
                         label: 'Reset',
@@ -478,9 +494,7 @@ class _ColorPickerPanelWidgetState extends ConsumerState<ColorPickerPanelWidget>
                     ),
                   ),
                   Icon(
-                    isExpanded
-                        ? Icons.expand_less
-                        : Icons.expand_more,
+                    isExpanded ? Icons.expand_less : Icons.expand_more,
                     color: Colors.white70,
                     size: 18,
                   ),
@@ -552,8 +566,7 @@ class _ColorPickerPanelWidgetState extends ConsumerState<ColorPickerPanelWidget>
                         ),
                         GestureDetector(
                           onTap: () {
-                            final updatedColors =
-                                List<Color>.from(colors);
+                            final updatedColors = List<Color>.from(colors);
                             updatedColors.remove(color);
                             if (updatedColors.isEmpty) {
                               ref
@@ -838,7 +851,8 @@ class _GradientColorPickerState extends State<GradientColorPicker> {
     final saturation = (_lastSelectPosition.dx / size.width).clamp(0.0, 1.0);
     final value = 1.0 - (_lastSelectPosition.dy / size.height).clamp(0.0, 1.0);
 
-    final color = HSVColor.fromAHSV(1, widget.hueValue, saturation, value).toColor();
+    final color =
+        HSVColor.fromAHSV(1, widget.hueValue, saturation, value).toColor();
     widget.onColorChanged(color);
   }
 }

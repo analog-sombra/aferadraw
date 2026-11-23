@@ -1,6 +1,6 @@
 import 'dart:io';
 import 'dart:ui' as ui;
-import 'package:flutter/material.dart';
+import 'package:material_ui/material_ui.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:vector_math/vector_math_64.dart' as v3;
 import '../notifiers/enhanced_drawing_notifier.dart';
@@ -41,14 +41,16 @@ class _ReferenceImageViewerState extends ConsumerState<ReferenceImageViewer> {
                 alignment: Alignment.center,
                 transform: Matrix4.identity()
                   // Apply canvas transformations first
-                  ..translateByVector3(v3.Vector3(drawingProvider.offsetX, drawingProvider.offsetY, 0))
-                  ..scaleByVector3(v3.Vector3(drawingProvider.scale, drawingProvider.scale, 1))
+                  ..translateByVector3(v3.Vector3(
+                      drawingProvider.offsetX, drawingProvider.offsetY, 0))
+                  ..scaleByVector3(v3.Vector3(
+                      drawingProvider.scale, drawingProvider.scale, 1))
                   ..rotateZ(drawingProvider.rotation)
                   // Apply reference image transformations
-                  ..translateByVector3(v3.Vector3(currentImage.offsetX, currentImage.offsetY, 0))
+                  ..translateByVector3(
+                      v3.Vector3(currentImage.offsetX, currentImage.offsetY, 0))
                   ..scaleByVector3(v3.Vector3(
-                      currentImage.scale *
-                          (currentImage.isFlipped ? -1 : 1),
+                      currentImage.scale * (currentImage.isFlipped ? -1 : 1),
                       currentImage.scale,
                       1))
                   ..rotateZ(currentImage.rotation),
@@ -127,7 +129,8 @@ class _ReferenceImageViewerState extends ConsumerState<ReferenceImageViewer> {
               onHorizontalDragEnd: (details) {
                 if (details.velocity.pixelsPerSecond.dx > _swipeThreshold) {
                   notifier.previousRefImage();
-                } else if (details.velocity.pixelsPerSecond.dx < -_swipeThreshold) {
+                } else if (details.velocity.pixelsPerSecond.dx <
+                    -_swipeThreshold) {
                   notifier.nextRefImage();
                 }
               },
@@ -138,7 +141,8 @@ class _ReferenceImageViewerState extends ConsumerState<ReferenceImageViewer> {
                     Transform(
                       alignment: Alignment.center,
                       transform: Matrix4.identity()
-                        ..translateByVector3(v3.Vector3(currentImage.offsetX, currentImage.offsetY, 0))
+                        ..translateByVector3(v3.Vector3(
+                            currentImage.offsetX, currentImage.offsetY, 0))
                         ..scaleByVector3(v3.Vector3(
                             currentImage.scale *
                                 (currentImage.isFlipped ? -1 : 1),
@@ -185,7 +189,8 @@ class _ReferenceImageViewerState extends ConsumerState<ReferenceImageViewer> {
                   children: [
                     IconButton(
                       icon: const Icon(Icons.flip_to_back),
-                      color: currentImage.isFlipped ? Colors.orange : Colors.white,
+                      color:
+                          currentImage.isFlipped ? Colors.orange : Colors.white,
                       tooltip: 'Flip horizontal',
                       iconSize: 18,
                       visualDensity: VisualDensity.compact,
@@ -324,7 +329,8 @@ class _ReferenceImageViewerState extends ConsumerState<ReferenceImageViewer> {
               left: 8,
               top: 70,
               child: Container(
-                padding: const EdgeInsets.symmetric(horizontal: 4, vertical: 18),
+                padding:
+                    const EdgeInsets.symmetric(horizontal: 4, vertical: 18),
                 decoration: BoxDecoration(
                   color: Colors.black87,
                   borderRadius: BorderRadius.circular(8),
@@ -519,10 +525,26 @@ class _ReferenceImageViewerState extends ConsumerState<ReferenceImageViewer> {
     final sb = (1 - s) * 0.114;
 
     return [
-      sr + s, sg, sb, 0, 0,
-      sr, sg + s, sb, 0, 0,
-      sr, sg, sb + s, 0, 0,
-      0, 0, 0, 1, 0,
+      sr + s,
+      sg,
+      sb,
+      0,
+      0,
+      sr,
+      sg + s,
+      sb,
+      0,
+      0,
+      sr,
+      sg,
+      sb + s,
+      0,
+      0,
+      0,
+      0,
+      0,
+      1,
+      0,
     ];
   }
 }

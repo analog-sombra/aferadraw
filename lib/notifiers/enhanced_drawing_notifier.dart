@@ -1,4 +1,4 @@
-import 'package:flutter/material.dart';
+import 'package:material_ui/material_ui.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:uuid/uuid.dart';
 import '../models/drawing_models.dart';
@@ -17,7 +17,7 @@ class EnhancedDrawingState {
   final bool isShowingReferenceImage;
   final bool isTransforming;
   final bool isRefImageDrawMode;
-  
+
   // Layer canvas storage
   final LayerCanvasStorage layerCanvasStorage;
 
@@ -61,7 +61,8 @@ class EnhancedDrawingState {
       isErasing: isErasing ?? this.isErasing,
       referenceImages: referenceImages ?? this.referenceImages,
       currentRefImageIndex: currentRefImageIndex ?? this.currentRefImageIndex,
-      isShowingReferenceImage: isShowingReferenceImage ?? this.isShowingReferenceImage,
+      isShowingReferenceImage:
+          isShowingReferenceImage ?? this.isShowingReferenceImage,
       isTransforming: isTransforming ?? this.isTransforming,
       isRefImageDrawMode: isRefImageDrawMode ?? this.isRefImageDrawMode,
       layerCanvasStorage: layerCanvasStorage ?? this.layerCanvasStorage,
@@ -86,8 +87,8 @@ class EnhancedDrawingNotifier extends StateNotifier<EnhancedDrawingState> {
 
   // Drag tracking
   Offset _dragStartPosition = Offset.zero;
-  double _dragStartScale = 1.0;
-  
+  final double _dragStartScale = 1.0;
+
   // For color tracking
   dynamic colorPickerRef;
 
@@ -122,12 +123,14 @@ class EnhancedDrawingNotifier extends StateNotifier<EnhancedDrawingState> {
       var newStorage = state.layerCanvasStorage;
       newStorage = newStorage.addStrokeToLayer(layerId, newStroke);
       state = state.copyWith(layerCanvasStorage: newStorage);
-      
+
       // Track color when user starts drawing (not erasing)
       if (!state.isErasing && colorPickerRef != null) {
         try {
-          final colorPickerNotifier = colorPickerRef.read(colorPickerProvider.notifier);
-          final selectedColor = colorPickerRef.read(colorPickerProvider).selectedColor;
+          final colorPickerNotifier =
+              colorPickerRef.read(colorPickerProvider.notifier);
+          final selectedColor =
+              colorPickerRef.read(colorPickerProvider).selectedColor;
           colorPickerNotifier.trackColorUsedOnCanvas(selectedColor);
         } catch (e) {
           // Silently ignore if color tracking fails
@@ -144,7 +147,11 @@ class EnhancedDrawingNotifier extends StateNotifier<EnhancedDrawingState> {
         layerId,
         _currentStrokeId!,
         [
-          ...state.layerCanvasStorage.getLayerCanvas(layerId).getLastStroke()?.points ?? [],
+          ...state.layerCanvasStorage
+                  .getLayerCanvas(layerId)
+                  .getLastStroke()
+                  ?.points ??
+              [],
           point,
         ],
       );
@@ -316,20 +323,24 @@ class EnhancedDrawingNotifier extends StateNotifier<EnhancedDrawingState> {
   void updateRefImageOffset(double dx, double dy) {
     final refImage = state.currentRefImage;
     if (refImage != null) {
-      updateReferenceImage(state.currentRefImageIndex, refImage.copyWith(
-        offsetX: refImage.offsetX + dx,
-        offsetY: refImage.offsetY + dy,
-      ));
+      updateReferenceImage(
+          state.currentRefImageIndex,
+          refImage.copyWith(
+            offsetX: refImage.offsetX + dx,
+            offsetY: refImage.offsetY + dy,
+          ));
     }
   }
 
   void onRefImageScaleUpdate(double scale, double rotation, int pointerCount) {
     final refImage = state.currentRefImage;
     if (refImage != null) {
-      updateReferenceImage(state.currentRefImageIndex, refImage.copyWith(
-        scale: (_lastScale * scale).clamp(0.1, 10.0),
-        rotation: refImage.rotation + rotation,
-      ));
+      updateReferenceImage(
+          state.currentRefImageIndex,
+          refImage.copyWith(
+            scale: (_lastScale * scale).clamp(0.1, 10.0),
+            rotation: refImage.rotation + rotation,
+          ));
     }
   }
 
@@ -354,39 +365,46 @@ class EnhancedDrawingNotifier extends StateNotifier<EnhancedDrawingState> {
   void toggleRefImageFlip() {
     final refImage = state.currentRefImage;
     if (refImage != null) {
-      updateReferenceImage(state.currentRefImageIndex, refImage.copyWith(
-        isFlipped: !refImage.isFlipped,
-      ));
+      updateReferenceImage(
+          state.currentRefImageIndex,
+          refImage.copyWith(
+            isFlipped: !refImage.isFlipped,
+          ));
     }
   }
 
   void autoFitRefImage() {
     final refImage = state.currentRefImage;
     if (refImage != null) {
-      updateReferenceImage(state.currentRefImageIndex, refImage.copyWith(
-        scale: 1.0,
-        offsetX: 0.0,
-        offsetY: 0.0,
-        rotation: 0.0,
-      ));
+      updateReferenceImage(
+          state.currentRefImageIndex,
+          refImage.copyWith(
+            scale: 1.0,
+            offsetX: 0.0,
+            offsetY: 0.0,
+            rotation: 0.0,
+          ));
     }
   }
 
   void resetRefImage() {
     final refImage = state.currentRefImage;
     if (refImage != null) {
-      updateReferenceImage(state.currentRefImageIndex, refImage.copyWith(
-        scale: 1.0,
-        rotation: 0.0,
-        offsetX: 0.0,
-        offsetY: 0.0,
-        isFlipped: false,
-      ));
+      updateReferenceImage(
+          state.currentRefImageIndex,
+          refImage.copyWith(
+            scale: 1.0,
+            rotation: 0.0,
+            offsetX: 0.0,
+            offsetY: 0.0,
+            isFlipped: false,
+          ));
     }
   }
 
   void removeCurrentRefImage() {
-    if (state.currentRefImageIndex >= 0 && state.currentRefImageIndex < state.referenceImages.length) {
+    if (state.currentRefImageIndex >= 0 &&
+        state.currentRefImageIndex < state.referenceImages.length) {
       removeReferenceImage(state.currentRefImageIndex);
     }
   }
@@ -394,36 +412,44 @@ class EnhancedDrawingNotifier extends StateNotifier<EnhancedDrawingState> {
   void setRefImageScale(double scale) {
     final refImage = state.currentRefImage;
     if (refImage != null) {
-      updateReferenceImage(state.currentRefImageIndex, refImage.copyWith(
-        scale: scale.clamp(0.1, 10.0),
-      ));
+      updateReferenceImage(
+          state.currentRefImageIndex,
+          refImage.copyWith(
+            scale: scale.clamp(0.1, 10.0),
+          ));
     }
   }
 
   void setRefImageRotation(double rotation) {
     final refImage = state.currentRefImage;
     if (refImage != null) {
-      updateReferenceImage(state.currentRefImageIndex, refImage.copyWith(
-        rotation: rotation,
-      ));
+      updateReferenceImage(
+          state.currentRefImageIndex,
+          refImage.copyWith(
+            rotation: rotation,
+          ));
     }
   }
 
   void updateRefImageOpacity(double opacity) {
     final refImage = state.currentRefImage;
     if (refImage != null) {
-      updateReferenceImage(state.currentRefImageIndex, refImage.copyWith(
-        opacity: opacity.clamp(0.0, 1.0),
-      ));
+      updateReferenceImage(
+          state.currentRefImageIndex,
+          refImage.copyWith(
+            opacity: opacity.clamp(0.0, 1.0),
+          ));
     }
   }
 
   void updateRefImageSaturation(double saturation) {
     final refImage = state.currentRefImage;
     if (refImage != null) {
-      updateReferenceImage(state.currentRefImageIndex, refImage.copyWith(
-        saturation: saturation.clamp(0.0, 2.0),
-      ));
+      updateReferenceImage(
+          state.currentRefImageIndex,
+          refImage.copyWith(
+            saturation: saturation.clamp(0.0, 2.0),
+          ));
     }
   }
 }

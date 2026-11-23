@@ -1,4 +1,4 @@
-import 'package:flutter/material.dart';
+import 'package:material_ui/material_ui.dart';
 
 class DrawingLine {
   final List<Offset> points;
@@ -137,7 +137,8 @@ class DrawingState {
       offsetY: offsetY ?? this.offsetY,
       referenceImages: referenceImages ?? this.referenceImages,
       currentRefImageIndex: currentRefImageIndex ?? this.currentRefImageIndex,
-      isShowingReferenceImage: isShowingReferenceImage ?? this.isShowingReferenceImage,
+      isShowingReferenceImage:
+          isShowingReferenceImage ?? this.isShowingReferenceImage,
       isTransforming: isTransforming ?? this.isTransforming,
       isRefImageDrawMode: isRefImageDrawMode ?? this.isRefImageDrawMode,
     );

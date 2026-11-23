@@ -1,4 +1,4 @@
-import 'package:flutter/material.dart';
+import 'package:material_ui/material_ui.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../providers/palette_state_provider.dart';
 import '../providers/color_picker_provider.dart';
@@ -134,7 +134,7 @@ class CompactCollapsiblePresetsSelector extends ConsumerWidget {
                                 ),
                                 boxShadow: [
                                   BoxShadow(
-                                    color: color.withOpacity(0.3),
+                                    color: color.withValues(alpha: 0.3),
                                     blurRadius: 4,
                                   )
                                 ],
@@ -178,6 +178,6 @@ class CompactCollapsiblePresetsSelector extends ConsumerWidget {
   }
 
   String _colorToHex(Color color) {
-    return '#${(color.value & 0xFFFFFF).toRadixString(16).padLeft(6, '0').toUpperCase()}';
+    return '#${(color.toARGB32() & 0xFFFFFF).toRadixString(16).padLeft(6, '0').toUpperCase()}';
   }
 }

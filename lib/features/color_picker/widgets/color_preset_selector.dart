@@ -1,4 +1,4 @@
-import 'package:flutter/material.dart';
+import 'package:material_ui/material_ui.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../providers/color_presets_provider.dart';
 
@@ -7,13 +7,14 @@ class ColorPresetSelector extends ConsumerStatefulWidget {
   final Function(Color)? onColorSelected;
 
   const ColorPresetSelector({
-    Key? key,
+    super.key,
     required this.onPresetSelected,
     this.onColorSelected,
-  }) : super(key: key);
+  });
 
   @override
-  ConsumerState<ColorPresetSelector> createState() => _ColorPresetSelectorState();
+  ConsumerState<ColorPresetSelector> createState() =>
+      _ColorPresetSelectorState();
 }
 
 class _ColorPresetSelectorState extends ConsumerState<ColorPresetSelector> {
@@ -60,7 +61,8 @@ class _ColorPresetSelectorState extends ConsumerState<ColorPresetSelector> {
               });
             },
             decoration: InputDecoration(
-              hintText: 'Search presets... (${filteredPresets.length}/${allPresets.length})',
+              hintText:
+                  'Search presets... (${filteredPresets.length}/${allPresets.length})',
               hintStyle: const TextStyle(fontSize: 12, color: Colors.grey),
               prefixIcon: const Icon(Icons.search, size: 18),
               suffixIcon: _searchQuery.isNotEmpty
@@ -76,7 +78,8 @@ class _ColorPresetSelectorState extends ConsumerState<ColorPresetSelector> {
                 borderRadius: BorderRadius.circular(8),
                 borderSide: const BorderSide(color: Colors.grey, width: 1),
               ),
-              contentPadding: const EdgeInsets.symmetric(vertical: 10, horizontal: 12),
+              contentPadding:
+                  const EdgeInsets.symmetric(vertical: 10, horizontal: 12),
             ),
             style: const TextStyle(fontSize: 12),
           ),
@@ -97,7 +100,8 @@ class _ColorPresetSelectorState extends ConsumerState<ColorPresetSelector> {
               value: selectedIndex,
               underline: const SizedBox(),
               items: List.generate(filteredPresets.length, (index) {
-                final originalIndex = allPresets.indexOf(filteredPresets[index]);
+                final originalIndex =
+                    allPresets.indexOf(filteredPresets[index]);
                 return DropdownMenuItem<int>(
                   value: originalIndex,
                   child: Row(
@@ -221,7 +225,7 @@ class _ColorPresetSelectorState extends ConsumerState<ColorPresetSelector> {
                             boxShadow: isSelected
                                 ? [
                                     BoxShadow(
-                                      color: color.withOpacity(0.5),
+                                      color: color.withValues(alpha: 0.5),
                                       blurRadius: 8,
                                       spreadRadius: 2,
                                     ),
@@ -273,7 +277,8 @@ class _ColorPresetSelectorState extends ConsumerState<ColorPresetSelector> {
                               width: 24,
                               height: 24,
                               decoration: BoxDecoration(
-                                color: selectedPreset.colors[selectedColorIndex],
+                                color:
+                                    selectedPreset.colors[selectedColorIndex],
                                 borderRadius: BorderRadius.circular(3),
                                 border: Border.all(
                                   color: Colors.grey.shade300,
@@ -332,6 +337,6 @@ class _ColorPresetSelectorState extends ConsumerState<ColorPresetSelector> {
   }
 
   String _colorToHex(Color color) {
-    return '#${color.value.toRadixString(16).substring(2).toUpperCase()}';
+    return '#${color.toARGB32().toRadixString(16).substring(2).toUpperCase()}';
   }
 }

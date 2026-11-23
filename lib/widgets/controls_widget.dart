@@ -1,5 +1,5 @@
 import 'dart:io';
-import 'package:flutter/material.dart';
+import 'package:material_ui/material_ui.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:image_picker/image_picker.dart';
 import '../notifiers/enhanced_drawing_notifier.dart';
@@ -11,10 +11,10 @@ class ControlsWidget extends ConsumerWidget {
   Future<void> _pickReferenceImage(WidgetRef ref) async {
     final notifier = ref.read(enhancedDrawingNotifierProvider.notifier);
     final picker = ImagePicker();
-    
+
     try {
       final pickedFile = await picker.pickImage(source: ImageSource.gallery);
-      
+
       if (pickedFile != null) {
         notifier.addReferenceImage(ReferenceImage(
           id: DateTime.now().millisecondsSinceEpoch.toString(),
@@ -165,7 +165,8 @@ class ControlsWidget extends ConsumerWidget {
                       if (drawingProvider.referenceImages.length > 1)
                         Text(
                           '${drawingProvider.currentRefImageIndex + 1}/${drawingProvider.referenceImages.length}',
-                          style: const TextStyle(fontSize: 10, color: Colors.purple),
+                          style: const TextStyle(
+                              fontSize: 10, color: Colors.purple),
                         ),
                     ],
                   ),
@@ -177,4 +178,3 @@ class ControlsWidget extends ConsumerWidget {
     );
   }
 }
-

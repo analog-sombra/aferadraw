@@ -1,4 +1,4 @@
-import 'package:flutter/material.dart';
+import 'package:material_ui/material_ui.dart';
 import '../models/layer_model.dart';
 
 class LayerTile extends StatefulWidget {
@@ -83,7 +83,9 @@ class _LayerTileState extends State<LayerTile> {
     return Container(
       margin: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
       decoration: BoxDecoration(
-        color: widget.isActive ? Colors.deepPurple.withOpacity(0.3) : Colors.transparent,
+        color: widget.isActive
+            ? Colors.deepPurple.withValues(alpha: 0.3)
+            : Colors.transparent,
         border: Border.all(
           color: widget.isActive ? Colors.deepPurple : Colors.transparent,
           width: 2,
@@ -119,7 +121,9 @@ class _LayerTileState extends State<LayerTile> {
                           style: TextStyle(
                             color: Colors.white,
                             fontSize: 13,
-                            fontWeight: widget.isActive ? FontWeight.w600 : FontWeight.normal,
+                            fontWeight: widget.isActive
+                                ? FontWeight.w600
+                                : FontWeight.normal,
                           ),
                           overflow: TextOverflow.ellipsis,
                         ),
@@ -138,8 +142,11 @@ class _LayerTileState extends State<LayerTile> {
                   // Visibility Toggle
                   IconButton(
                     icon: Icon(
-                      widget.layer.isVisible ? Icons.visibility : Icons.visibility_off,
-                      color: widget.layer.isVisible ? Colors.white : Colors.grey,
+                      widget.layer.isVisible
+                          ? Icons.visibility
+                          : Icons.visibility_off,
+                      color:
+                          widget.layer.isVisible ? Colors.white : Colors.grey,
                       size: 18,
                     ),
                     onPressed: widget.onVisibilityToggle,
@@ -153,7 +160,8 @@ class _LayerTileState extends State<LayerTile> {
                   IconButton(
                     icon: Icon(
                       widget.layer.isLocked ? Icons.lock : Icons.lock_open,
-                      color: widget.layer.isLocked ? Colors.orange : Colors.grey,
+                      color:
+                          widget.layer.isLocked ? Colors.orange : Colors.grey,
                       size: 18,
                     ),
                     onPressed: widget.layer.name == 'Background'
@@ -167,24 +175,26 @@ class _LayerTileState extends State<LayerTile> {
 
                   // More Options
                   PopupMenuButton(
-                    icon: const Icon(Icons.more_vert, size: 18, color: Colors.grey),
+                    icon: const Icon(Icons.more_vert,
+                        size: 18, color: Colors.grey),
                     itemBuilder: (context) => [
                       PopupMenuItem(
-                        child: const Text('Rename'),
                         onTap: _showRenameDialog,
+                        child: const Text('Rename'),
                       ),
                       PopupMenuItem(
-                        child: const Text('Move Up'),
                         onTap: widget.onMoveUp,
+                        child: const Text('Move Up'),
                       ),
                       PopupMenuItem(
-                        child: const Text('Move Down'),
                         onTap: widget.onMoveDown,
+                        child: const Text('Move Down'),
                       ),
                       if (widget.layer.name != 'Background')
                         PopupMenuItem(
-                          child: const Text('Delete', style: TextStyle(color: Colors.red)),
                           onTap: widget.onDelete,
+                          child: const Text('Delete',
+                              style: TextStyle(color: Colors.red)),
                         ),
                     ],
                   ),

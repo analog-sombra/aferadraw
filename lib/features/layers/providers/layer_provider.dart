@@ -1,4 +1,4 @@
-import 'package:flutter/material.dart';
+import 'package:material_ui/material_ui.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../models/layer_model.dart';
 import '../../../core/utils/uuid_generator.dart';
@@ -17,7 +17,7 @@ class LayerStackNotifier extends StateNotifier<LayerStack> {
       isLocked: true,
       type: 'basic',
     );
-    
+
     // Create new layer for drawing
     final newLayer = Layer(
       id: UuidGenerator.generate(),
@@ -25,7 +25,7 @@ class LayerStackNotifier extends StateNotifier<LayerStack> {
       isLocked: false,
       type: 'basic',
     );
-    
+
     return LayerStack(
       layers: [newLayer, bgLayer],
       activeLayerIndex: 0,
@@ -68,14 +68,14 @@ class LayerStackNotifier extends StateNotifier<LayerStack> {
   void deleteLayerSmart(int index) {
     if (index < 0 || index >= state.layers.length) return;
     if (state.layers[index].name == 'Background') return;
-    
+
     final layers = [...state.layers];
     final layerToDelete = layers[index];
-    
+
     // If it's a group, ungroup its children
     if (layerToDelete.type == 'group') {
       final children = layerToDelete.childLayerIds;
-      
+
       // Update all children to remove parent reference
       for (var childId in children) {
         for (int i = 0; i < layers.length; i++) {
@@ -86,20 +86,20 @@ class LayerStackNotifier extends StateNotifier<LayerStack> {
         }
       }
     }
-    
+
     // Notify drawing system
     onLayerDeleted?.call(layerToDelete.id);
-    
+
     // Remove the layer
     layers.removeAt(index);
-    
+
     if (layers.isEmpty) return;
-    
+
     int newActiveIndex = state.activeLayerIndex;
     if (newActiveIndex >= layers.length) {
       newActiveIndex = layers.length - 1;
     }
-    
+
     state = state.copyWith(
       layers: layers,
       activeLayerIndex: newActiveIndex,
@@ -147,12 +147,12 @@ class LayerStackNotifier extends StateNotifier<LayerStack> {
   /// Move layer up (towards top of canvas)
   void moveLayerUp(int index) {
     if (index <= 0) return;
-    
+
     final layers = [...state.layers];
     final temp = layers[index];
     layers[index] = layers[index - 1];
     layers[index - 1] = temp;
-    
+
     // Update active layer index if it moved
     int newActiveIndex = state.activeLayerIndex;
     if (newActiveIndex == index) {
@@ -160,7 +160,7 @@ class LayerStackNotifier extends StateNotifier<LayerStack> {
     } else if (newActiveIndex == index - 1) {
       newActiveIndex = index;
     }
-    
+
     state = state.copyWith(
       layers: layers,
       activeLayerIndex: newActiveIndex,
@@ -170,12 +170,12 @@ class LayerStackNotifier extends StateNotifier<LayerStack> {
   /// Move layer down (towards bottom of canvas)
   void moveLayerDown(int index) {
     if (index >= state.layers.length - 1) return;
-    
+
     final layers = [...state.layers];
     final temp = layers[index];
     layers[index] = layers[index + 1];
     layers[index + 1] = temp;
-    
+
     // Update active layer index if it moved
     int newActiveIndex = state.activeLayerIndex;
     if (newActiveIndex == index) {
@@ -183,7 +183,7 @@ class LayerStackNotifier extends StateNotifier<LayerStack> {
     } else if (newActiveIndex == index + 1) {
       newActiveIndex = index;
     }
-    
+
     state = state.copyWith(
       layers: layers,
       activeLayerIndex: newActiveIndex,
@@ -195,21 +195,25 @@ class LayerStackNotifier extends StateNotifier<LayerStack> {
     if (oldIndex == newIndex) return;
     if (oldIndex < 0 || oldIndex >= state.layers.length) return;
     if (newIndex < 0 || newIndex >= state.layers.length) return;
-    
+
     final layers = [...state.layers];
     final layer = layers.removeAt(oldIndex);
     layers.insert(newIndex, layer);
-    
+
     // Update active layer index
     int newActiveIndex = state.activeLayerIndex;
     if (newActiveIndex == oldIndex) {
       newActiveIndex = newIndex;
-    } else if (oldIndex < newIndex && newActiveIndex > oldIndex && newActiveIndex <= newIndex) {
+    } else if (oldIndex < newIndex &&
+        newActiveIndex > oldIndex &&
+        newActiveIndex <= newIndex) {
       newActiveIndex--;
-    } else if (oldIndex > newIndex && newActiveIndex >= newIndex && newActiveIndex < oldIndex) {
+    } else if (oldIndex > newIndex &&
+        newActiveIndex >= newIndex &&
+        newActiveIndex < oldIndex) {
       newActiveIndex++;
     }
-    
+
     state = state.copyWith(
       layers: layers,
       activeLayerIndex: newActiveIndex,
@@ -221,36 +225,36 @@ class LayerStackNotifier extends StateNotifier<LayerStack> {
     if (layerIndex == groupIndex) return;
     if (layerIndex < 0 || layerIndex >= state.layers.length) return;
     if (groupIndex < 0 || groupIndex >= state.layers.length) return;
-    
+
     final groupLayer = state.layers[groupIndex];
     if (groupLayer.type != 'group') return; // Target must be a group
-    
+
     final layers = [...state.layers];
     final layerToMove = layers[layerIndex];
-    
+
     // Add to group's children
     final updatedGroupLayer = groupLayer.copyWith(
       childLayerIds: [...groupLayer.childLayerIds, layerToMove.id],
     );
-    
+
     // Update layer with parent reference
     final updatedLayer = layerToMove.copyWith(parentId: groupLayer.id);
-    
+
     layers[groupIndex] = updatedGroupLayer;
     layers[layerIndex] = updatedLayer;
-    
+
     state = state.copyWith(layers: layers);
   }
 
   /// Remove a layer from its group
   void removeLayerFromGroup(int layerIndex) {
     if (layerIndex < 0 || layerIndex >= state.layers.length) return;
-    
+
     final layers = [...state.layers];
     final layer = layers[layerIndex];
-    
+
     if (layer.parentId == null) return; // Not in a group
-    
+
     // Find parent group and remove from children
     int parentIndex = -1;
     for (int i = 0; i < layers.length; i++) {
@@ -259,20 +263,19 @@ class LayerStackNotifier extends StateNotifier<LayerStack> {
         break;
       }
     }
-    
+
     if (parentIndex != -1) {
       final parentGroup = layers[parentIndex];
       final updatedParent = parentGroup.copyWith(
-        childLayerIds: parentGroup.childLayerIds
-            .where((id) => id != layer.id)
-            .toList(),
+        childLayerIds:
+            parentGroup.childLayerIds.where((id) => id != layer.id).toList(),
       );
       layers[parentIndex] = updatedParent;
     }
-    
+
     // Remove parent reference
     layers[layerIndex] = layer.copyWith(parentId: null);
-    
+
     state = state.copyWith(layers: layers);
   }
 
@@ -282,13 +285,13 @@ class LayerStackNotifier extends StateNotifier<LayerStack> {
     if (layerIndex == targetGroupIndex) return;
     if (layerIndex < 0 || layerIndex >= state.layers.length) return;
     if (targetGroupIndex < 0 || targetGroupIndex >= state.layers.length) return;
-    
+
     final targetGroup = state.layers[targetGroupIndex];
     if (targetGroup.type != 'group') return; // Target must be a group
-    
+
     final layers = [...state.layers];
     final layerToMove = layers[layerIndex];
-    
+
     // If layer is currently in a group, remove it from that group first
     if (layerToMove.parentId != null && layerToMove.parentId!.isNotEmpty) {
       int oldParentIndex = -1;
@@ -298,7 +301,7 @@ class LayerStackNotifier extends StateNotifier<LayerStack> {
           break;
         }
       }
-      
+
       if (oldParentIndex != -1) {
         final oldParentGroup = layers[oldParentIndex];
         final updatedOldParent = oldParentGroup.copyWith(
@@ -309,25 +312,25 @@ class LayerStackNotifier extends StateNotifier<LayerStack> {
         layers[oldParentIndex] = updatedOldParent;
       }
     }
-    
+
     // Add to new group's children
     final updatedTargetGroup = targetGroup.copyWith(
       childLayerIds: [...targetGroup.childLayerIds, layerToMove.id],
     );
-    
+
     // Update layer with new parent reference
     final updatedLayer = layerToMove.copyWith(parentId: targetGroup.id);
-    
+
     layers[targetGroupIndex] = updatedTargetGroup;
     layers[layerIndex] = updatedLayer;
-    
+
     state = state.copyWith(layers: layers);
   }
 
   /// Set blend mode for a layer
   void setBlendMode(int index, BlendMode blendMode) {
     if (index < 0 || index >= state.layers.length) return;
-    
+
     final layers = [...state.layers];
     layers[index] = layers[index].copyWith(blendMode: blendMode);
     state = state.copyWith(layers: layers);

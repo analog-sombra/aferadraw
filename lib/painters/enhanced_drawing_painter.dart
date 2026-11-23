@@ -1,4 +1,4 @@
-import 'package:flutter/material.dart';
+import 'package:material_ui/material_ui.dart';
 import '../features/layers/models/layer_canvas_model.dart';
 
 class EnhancedDrawingPainter extends CustomPainter {
@@ -27,7 +27,7 @@ class EnhancedDrawingPainter extends CustomPainter {
     // Draw layers from bottom to top (reverse order)
     for (int i = layerOrder.length - 1; i >= 0; i--) {
       final layerId = layerOrder[i];
-      
+
       // Skip hidden layers
       if (layerVisibility[layerId] == false) continue;
 
@@ -40,7 +40,7 @@ class EnhancedDrawingPainter extends CustomPainter {
         canvas.saveLayer(
           Rect.fromLTWH(0, 0, size.width, size.height),
           Paint()
-            ..color = Colors.black.withOpacity(opacity)
+            ..color = Colors.black.withValues(alpha: opacity)
             ..blendMode = blendMode,
         );
       }
@@ -70,7 +70,7 @@ class EnhancedDrawingPainter extends CustomPainter {
     } else {
       // Apply layer opacity to stroke color
       final paint = Paint()
-        ..color = stroke.color.withOpacity(layerOpacity)
+        ..color = stroke.color.withValues(alpha: layerOpacity)
         ..strokeWidth = stroke.strokeWidth
         ..strokeCap = StrokeCap.round
         ..strokeJoin = StrokeJoin.round;

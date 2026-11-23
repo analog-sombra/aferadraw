@@ -1,4 +1,4 @@
-import 'package:flutter/material.dart';
+import 'package:material_ui/material_ui.dart';
 import '../models/layer_model.dart';
 import '../models/layer_canvas_model.dart';
 
@@ -29,7 +29,8 @@ class LayerPreviewPainter extends CustomPainter {
     for (final stroke in strokes) {
       if (stroke.points.isNotEmpty) {
         for (final point in stroke.points) {
-          final pointRect = Rect.fromCircle(center: point, radius: stroke.strokeWidth / 2);
+          final pointRect =
+              Rect.fromCircle(center: point, radius: stroke.strokeWidth / 2);
           strokeBounds = strokeBounds?.expandToInclude(pointRect) ?? pointRect;
         }
       }
@@ -39,17 +40,17 @@ class LayerPreviewPainter extends CustomPainter {
 
     // Save and scale canvas if needed
     canvas.save();
-    
+
     if (fitToView && (strokeBounds.width > 0 || strokeBounds.height > 0)) {
       // Calculate scale to fit content in preview with padding
       final padding = 4.0;
       final availableWidth = size.width - (padding * 2);
       final availableHeight = size.height - (padding * 2);
-      
+
       final scaleX = availableWidth / strokeBounds.width;
       final scaleY = availableHeight / strokeBounds.height;
       final scale = (scaleX < scaleY ? scaleX : scaleY).clamp(0.1, 1.0);
-      
+
       // Translate and scale
       canvas.translate(padding, padding);
       canvas.translate(

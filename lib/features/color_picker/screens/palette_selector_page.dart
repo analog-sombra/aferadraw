@@ -1,4 +1,4 @@
-import 'package:flutter/material.dart';
+import 'package:material_ui/material_ui.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../color_preset_model.dart';
 import '../providers/color_presets_provider.dart';
@@ -59,7 +59,7 @@ class _PaletteSelectorPageState extends ConsumerState<PaletteSelectorPage>
           preset.colors,
           isAI: false,
         );
-    
+
     // Set the first color in color picker
     if (preset.colors.isNotEmpty) {
       ref.read(colorPickerProvider.notifier).setColor(preset.colors[0]);
@@ -228,7 +228,7 @@ class _PaletteSelectorPageState extends ConsumerState<PaletteSelectorPage>
                           boxShadow: isSelected
                               ? [
                                   BoxShadow(
-                                    color: Colors.blue.withOpacity(0.3),
+                                    color: Colors.blue.withValues(alpha: 0.3),
                                     blurRadius: 8,
                                     offset: const Offset(0, 2),
                                   )
@@ -313,26 +313,30 @@ class _PaletteSelectorPageState extends ConsumerState<PaletteSelectorPage>
                   Expanded(
                     child: TextField(
                       onChanged: (value) {
-                        ref.read(apiPaletteSearchProvider.notifier).state = value;
+                        ref.read(apiPaletteSearchProvider.notifier).state =
+                            value;
                         ref.read(apiPalettePageProvider.notifier).state = 1;
                       },
                       style: const TextStyle(color: Colors.white, fontSize: 13),
                       decoration: InputDecoration(
                         hintText: 'Search AI Color palettes...',
-                        hintStyle: const TextStyle(color: Colors.grey, fontSize: 13),
-                        prefixIcon:
-                            const Icon(Icons.search, color: Colors.grey, size: 18),
+                        hintStyle:
+                            const TextStyle(color: Colors.grey, fontSize: 13),
+                        prefixIcon: const Icon(Icons.search,
+                            color: Colors.grey, size: 18),
                         filled: true,
                         fillColor: Colors.grey[900],
-                        contentPadding:
-                            const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
+                        contentPadding: const EdgeInsets.symmetric(
+                            horizontal: 12, vertical: 10),
                         border: OutlineInputBorder(
                           borderRadius: BorderRadius.circular(6),
-                          borderSide: BorderSide(color: Colors.grey[700]!, width: 1),
+                          borderSide:
+                              BorderSide(color: Colors.grey[700]!, width: 1),
                         ),
                         enabledBorder: OutlineInputBorder(
                           borderRadius: BorderRadius.circular(6),
-                          borderSide: BorderSide(color: Colors.grey[700]!, width: 1),
+                          borderSide:
+                              BorderSide(color: Colors.grey[700]!, width: 1),
                         ),
                         focusedBorder: OutlineInputBorder(
                           borderRadius: BorderRadius.circular(6),
@@ -579,12 +583,13 @@ class _PaletteSelectorPageState extends ConsumerState<PaletteSelectorPage>
                                             vertical: 2,
                                           ),
                                           decoration: BoxDecoration(
-                                            color: Colors.blue.withOpacity(0.2),
+                                            color: Colors.blue
+                                                .withValues(alpha: 0.2),
                                             borderRadius:
                                                 BorderRadius.circular(3),
                                             border: Border.all(
-                                              color:
-                                                  Colors.blue.withOpacity(0.5),
+                                              color: Colors.blue
+                                                  .withValues(alpha: 0.5),
                                               width: 0.5,
                                             ),
                                           ),
@@ -697,7 +702,8 @@ class _PaletteSelectorPageState extends ConsumerState<PaletteSelectorPage>
                   ),
                   const SizedBox(width: 12),
                   Container(
-                    padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+                    padding:
+                        const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
                     decoration: BoxDecoration(
                       color: Colors.grey[850],
                       borderRadius: BorderRadius.circular(6),
@@ -748,6 +754,6 @@ class _PaletteSelectorPageState extends ConsumerState<PaletteSelectorPage>
   }
 
   String _colorToHex(Color color) {
-    return '#${(color.value & 0xFFFFFF).toRadixString(16).padLeft(6, '0').toUpperCase()}';
+    return '#${(color.toARGB32() & 0xFFFFFF).toRadixString(16).padLeft(6, '0').toUpperCase()}';
   }
 }

@@ -1,5 +1,5 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:flutter/material.dart';
+import 'package:material_ui/material_ui.dart';
 
 /// Represents a palette (can be local or AI)
 class Palette {
@@ -44,7 +44,8 @@ class PaletteNotifier extends StateNotifier<PaletteState> {
 
   /// Set a palette as selected
   void selectPalette(String name, List<Color> colors, {bool isAI = false}) {
-    print('[DEBUG PaletteNotifier] selectPalette: name=$name, colorCount=${colors.length}, isAI=$isAI');
+    print(
+        '[DEBUG PaletteNotifier] selectPalette: name=$name, colorCount=${colors.length}, isAI=$isAI');
     state = state.copyWith(
       selectedPalette: Palette(
         name: name,

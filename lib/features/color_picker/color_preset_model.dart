@@ -1,4 +1,4 @@
-import 'package:flutter/material.dart';
+import 'package:material_ui/material_ui.dart';
 
 class ColorPreset {
   final String name;
@@ -11,7 +11,8 @@ class ColorPreset {
     this.description = '',
   });
 
-  factory ColorPreset.fromHexList(String name, List<String> hexColors, {String description = ''}) {
+  factory ColorPreset.fromHexList(String name, List<String> hexColors,
+      {String description = ''}) {
     final colors = hexColors.map((hex) => _hexToColor(hex)).toList();
     return ColorPreset(
       name: name,

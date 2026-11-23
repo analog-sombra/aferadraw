@@ -1,10 +1,10 @@
-import 'package:flutter/material.dart';
+import 'package:material_ui/material_ui.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../providers/color_presets_provider.dart';
 import '../providers/color_picker_provider.dart';
 
 class CompactColorPresetSelector extends ConsumerWidget {
-  const CompactColorPresetSelector({Key? key}) : super(key: key);
+  const CompactColorPresetSelector({super.key});
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
@@ -94,7 +94,8 @@ class CompactColorPresetSelector extends ConsumerWidget {
                   }),
                   onChanged: (value) {
                     if (value != null) {
-                      ref.read(selectedPresetIndexProvider.notifier).state = value;
+                      ref.read(selectedPresetIndexProvider.notifier).state =
+                          value;
                       // Set the first color from preset
                       if (allPresets[value].colors.isNotEmpty) {
                         ref
@@ -155,9 +156,7 @@ class CompactColorPresetSelector extends ConsumerWidget {
                         ref.read(selectedPresetColorProvider.notifier).state =
                             isSelected ? null : index;
                         // Set color when clicked
-                        ref
-                            .read(colorPickerProvider.notifier)
-                            .setColor(color);
+                        ref.read(colorPickerProvider.notifier).setColor(color);
                       },
                       child: Container(
                         width: 36,
@@ -177,7 +176,7 @@ class CompactColorPresetSelector extends ConsumerWidget {
                           boxShadow: isSelected
                               ? [
                                   BoxShadow(
-                                    color: color.withOpacity(0.6),
+                                    color: color.withValues(alpha: 0.6),
                                     blurRadius: 6,
                                     spreadRadius: 1,
                                   ),

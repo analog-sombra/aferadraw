@@ -1,4 +1,4 @@
-import 'package:flutter/material.dart';
+import 'package:material_ui/material_ui.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../color_preset_model.dart';
 import '../providers/color_presets_provider.dart';
@@ -108,13 +108,11 @@ class _EnhancedPresetSelectorState
                     const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
                 border: OutlineInputBorder(
                   borderRadius: BorderRadius.circular(8),
-                  borderSide:
-                      BorderSide(color: Colors.grey[700]!, width: 0.5),
+                  borderSide: BorderSide(color: Colors.grey[700]!, width: 0.5),
                 ),
                 enabledBorder: OutlineInputBorder(
                   borderRadius: BorderRadius.circular(8),
-                  borderSide:
-                      BorderSide(color: Colors.grey[700]!, width: 0.5),
+                  borderSide: BorderSide(color: Colors.grey[700]!, width: 0.5),
                 ),
                 focusedBorder: OutlineInputBorder(
                   borderRadius: BorderRadius.circular(8),
@@ -322,7 +320,7 @@ class _EnhancedPresetSelectorState
   }
 
   String _colorToHex(Color color) {
-    return '#${(color.value & 0xFFFFFF).toRadixString(16).padLeft(6, '0').toUpperCase()}';
+    return '#${(color.toARGB32() & 0xFFFFFF).toRadixString(16).padLeft(6, '0').toUpperCase()}';
   }
 
   Widget _buildColorBox(Color color, int index) {

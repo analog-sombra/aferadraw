@@ -1,4 +1,4 @@
-import 'package:flutter/material.dart';
+import 'package:material_ui/material_ui.dart';
 
 /// Represents a single stroke on a layer
 class LayerStroke {
@@ -103,7 +103,8 @@ class LayerCanvasStorage {
   }
 
   /// Set canvas data for a specific layer
-  LayerCanvasStorage setLayerCanvas(String layerId, LayerCanvasData canvasData) {
+  LayerCanvasStorage setLayerCanvas(
+      String layerId, LayerCanvasData canvasData) {
     return LayerCanvasStorage(
       layerCanvasMap: {
         ...layerCanvasMap,
@@ -125,7 +126,8 @@ class LayerCanvasStorage {
     List<Offset> newPoints,
   ) {
     final currentCanvas = getLayerCanvas(layerId);
-    return setLayerCanvas(layerId, currentCanvas.updateStroke(strokeId, newPoints));
+    return setLayerCanvas(
+        layerId, currentCanvas.updateStroke(strokeId, newPoints));
   }
 
   /// Remove a stroke from a layer
@@ -153,7 +155,7 @@ class LayerCanvasStorage {
     Map<String, bool> layerVisibilityMap,
   ) {
     final result = <MapEntry<String, LayerStroke>>[];
-    
+
     for (final layerId in layerIds) {
       if (layerVisibilityMap[layerId] != false) {
         final canvas = getLayerCanvas(layerId);
@@ -162,7 +164,7 @@ class LayerCanvasStorage {
         }
       }
     }
-    
+
     return result;
   }
 }

@@ -1,4 +1,4 @@
-import 'package:flutter/material.dart';
+import 'package:material_ui/material_ui.dart';
 import 'package:vector_math/vector_math_64.dart' as v3;
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../notifiers/enhanced_drawing_notifier.dart';
@@ -22,8 +22,9 @@ class _CanvasWidgetState extends ConsumerState<CanvasWidget> {
     // Set up callback for layer deletion
     WidgetsBinding.instance.addPostFrameCallback((_) {
       final layerNotifier = ref.read(layerStackProvider.notifier);
-      final drawingNotifier = ref.read(enhancedDrawingNotifierProvider.notifier);
-      
+      final drawingNotifier =
+          ref.read(enhancedDrawingNotifierProvider.notifier);
+
       layerNotifier.onLayerDeleted = (layerId) {
         drawingNotifier.deleteLayerCanvas(layerId);
       };
@@ -42,7 +43,8 @@ class _CanvasWidgetState extends ConsumerState<CanvasWidget> {
         children: [
           _CanvasGestureHandler(
             canvasKey: canvasKey,
-            isShowingRef: drawingProvider.isShowingReferenceImage && !drawingProvider.isRefImageDrawMode,
+            isShowingRef: drawingProvider.isShowingReferenceImage &&
+                !drawingProvider.isRefImageDrawMode,
             notifier: notifier,
             drawingProvider: drawingProvider,
             layerStack: layerStack,
@@ -84,7 +86,9 @@ class _CanvasGestureHandlerState extends State<_CanvasGestureHandler> {
     if (activeLayer == null) return false;
     if (activeLayer.isLocked) return false;
     if (!activeLayer.isVisible) return false;
-    if (activeLayer.type == 'group') return false; // Cannot draw on group layers
+    if (activeLayer.type == 'group') {
+      return false; // Cannot draw on group layers
+    }
     return true;
   }
 
@@ -122,8 +126,7 @@ class _CanvasGestureHandlerState extends State<_CanvasGestureHandler> {
                 final renderBox = widget.canvasKey.currentContext
                     ?.findRenderObject() as RenderBox?;
                 if (renderBox != null) {
-                  final localPos =
-                      renderBox.globalToLocal(details.focalPoint);
+                  final localPos = renderBox.globalToLocal(details.focalPoint);
                   widget.notifier.startDrawing(
                     widget.layerStack.activeLayer!.id,
                     localPos,
@@ -152,8 +155,8 @@ class _CanvasGestureHandlerState extends State<_CanvasGestureHandler> {
                   }
                 } else if (details.pointerCount > 1) {
                   widget.notifier.startTransforming();
-                  widget.notifier.onScaleUpdate(details.scale, details.rotation,
-                      details.pointerCount);
+                  widget.notifier.onScaleUpdate(
+                      details.scale, details.rotation, details.pointerCount);
                 }
               }
             },
@@ -166,8 +169,10 @@ class _CanvasGestureHandlerState extends State<_CanvasGestureHandler> {
             child: Transform(
               alignment: Alignment.center,
               transform: Matrix4.identity()
-                ..translateByVector3(v3.Vector3(widget.drawingProvider.offsetX, widget.drawingProvider.offsetY, 0))
-                ..scaleByVector3(v3.Vector3(widget.drawingProvider.scale, widget.drawingProvider.scale, 1))
+                ..translateByVector3(v3.Vector3(widget.drawingProvider.offsetX,
+                    widget.drawingProvider.offsetY, 0))
+                ..scaleByVector3(v3.Vector3(widget.drawingProvider.scale,
+                    widget.drawingProvider.scale, 1))
                 ..rotateZ(widget.drawingProvider.rotation),
               child: ClipRect(
                 child: Container(
@@ -202,8 +207,7 @@ class _CanvasGestureHandlerState extends State<_CanvasGestureHandler> {
                           layer.id: layer.blendMode
                       },
                       layerOrder: <String>[
-                        for (final layer in widget.layerStack.layers)
-                          layer.id
+                        for (final layer in widget.layerStack.layers) layer.id
                       ],
                     ),
                     size: Size.infinite,

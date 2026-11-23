@@ -1,4 +1,4 @@
-import 'package:flutter/material.dart';
+import 'package:material_ui/material_ui.dart';
 import '../widgets/toolbar_widget.dart';
 import '../widgets/canvas_widget.dart';
 import '../widgets/controls_widget.dart';

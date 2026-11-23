@@ -1,4 +1,4 @@
-import 'package:flutter/material.dart';
+import 'package:material_ui/material_ui.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../models/drawing_models.dart';
 
@@ -175,7 +175,8 @@ class DrawingNotifier extends StateNotifier<DrawingState> {
   void updateMoveOffset(double deltaX, double deltaY) {
     final newOffsetX = state.offsetX + deltaX;
     final newOffsetY = state.offsetY + deltaY;
-    state = state.copyWith(offsetX: newOffsetX, offsetY: newOffsetY, isTransforming: true);
+    state = state.copyWith(
+        offsetX: newOffsetX, offsetY: newOffsetY, isTransforming: true);
   }
 
   // Reference Image Methods
@@ -194,20 +195,21 @@ class DrawingNotifier extends StateNotifier<DrawingState> {
 
   void removeCurrentRefImage() {
     if (state.currentRefImage == null) return;
-    
+
     final updatedImages = state.referenceImages
         .where((img) => img.id != state.currentRefImage!.id)
         .toList();
-    
+
     int newIndex = state.currentRefImageIndex;
     if (newIndex >= updatedImages.length) {
       newIndex = updatedImages.length - 1;
     }
-    
+
     state = state.copyWith(
       referenceImages: updatedImages,
       currentRefImageIndex: newIndex >= 0 ? newIndex : 0,
-      isShowingReferenceImage: updatedImages.isNotEmpty ? state.isShowingReferenceImage : false,
+      isShowingReferenceImage:
+          updatedImages.isNotEmpty ? state.isShowingReferenceImage : false,
     );
   }
 
@@ -219,7 +221,8 @@ class DrawingNotifier extends StateNotifier<DrawingState> {
 
   void nextRefImage() {
     if (state.referenceImages.isEmpty) return;
-    final nextIndex = (state.currentRefImageIndex + 1) % state.referenceImages.length;
+    final nextIndex =
+        (state.currentRefImageIndex + 1) % state.referenceImages.length;
     selectRefImage(nextIndex);
   }
 
@@ -251,11 +254,11 @@ class DrawingNotifier extends StateNotifier<DrawingState> {
 
     final scaleChange = delta / 500;
     final newScale = (currentImage.scale - scaleChange).clamp(0.5, 5.0);
-    
+
     final updatedImages = state.referenceImages.map((img) {
       return img.id == currentImage.id ? img.copyWith(scale: newScale) : img;
     }).toList();
-    
+
     state = state.copyWith(referenceImages: updatedImages);
   }
 
@@ -264,11 +267,13 @@ class DrawingNotifier extends StateNotifier<DrawingState> {
     if (currentImage == null) return;
 
     final clampedScale = scale.clamp(0.1, 3.0);
-    
+
     final updatedImages = state.referenceImages.map((img) {
-      return img.id == currentImage.id ? img.copyWith(scale: clampedScale) : img;
+      return img.id == currentImage.id
+          ? img.copyWith(scale: clampedScale)
+          : img;
     }).toList();
-    
+
     state = state.copyWith(referenceImages: updatedImages);
   }
 
@@ -278,11 +283,13 @@ class DrawingNotifier extends StateNotifier<DrawingState> {
 
     final rotationChange = delta / 200;
     final newRotation = currentImage.rotation + rotationChange;
-    
+
     final updatedImages = state.referenceImages.map((img) {
-      return img.id == currentImage.id ? img.copyWith(rotation: newRotation) : img;
+      return img.id == currentImage.id
+          ? img.copyWith(rotation: newRotation)
+          : img;
     }).toList();
-    
+
     state = state.copyWith(referenceImages: updatedImages);
   }
 
@@ -293,7 +300,7 @@ class DrawingNotifier extends StateNotifier<DrawingState> {
     final updatedImages = state.referenceImages.map((img) {
       return img.id == currentImage.id ? img.copyWith(rotation: rotation) : img;
     }).toList();
-    
+
     state = state.copyWith(referenceImages: updatedImages);
   }
 
@@ -303,13 +310,13 @@ class DrawingNotifier extends StateNotifier<DrawingState> {
 
     final newOffsetX = currentImage.offsetX + deltaX;
     final newOffsetY = currentImage.offsetY + deltaY;
-    
+
     final updatedImages = state.referenceImages.map((img) {
       return img.id == currentImage.id
           ? img.copyWith(offsetX: newOffsetX, offsetY: newOffsetY)
           : img;
     }).toList();
-    
+
     state = state.copyWith(referenceImages: updatedImages);
   }
 
@@ -330,13 +337,13 @@ class DrawingNotifier extends StateNotifier<DrawingState> {
 
       final newScale = (_lastScale * scale).clamp(0.5, 5.0);
       final newRotation = _lastRotation + rotation;
-      
+
       final updatedImages = state.referenceImages.map((img) {
         return img.id == currentImage.id
             ? img.copyWith(scale: newScale, rotation: newRotation)
             : img;
       }).toList();
-      
+
       state = state.copyWith(referenceImages: updatedImages);
     }
   }
@@ -350,7 +357,7 @@ class DrawingNotifier extends StateNotifier<DrawingState> {
           ? img.copyWith(scale: 1.0, rotation: 0.0, offsetX: 0.0, offsetY: 0.0)
           : img;
     }).toList();
-    
+
     state = state.copyWith(referenceImages: updatedImages);
   }
 
@@ -360,9 +367,11 @@ class DrawingNotifier extends StateNotifier<DrawingState> {
 
     final clampedOpacity = opacity.clamp(0.0, 1.0);
     final updatedImages = state.referenceImages.map((img) {
-      return img.id == currentImage.id ? img.copyWith(opacity: clampedOpacity) : img;
+      return img.id == currentImage.id
+          ? img.copyWith(opacity: clampedOpacity)
+          : img;
     }).toList();
-    
+
     state = state.copyWith(referenceImages: updatedImages);
   }
 
@@ -376,7 +385,7 @@ class DrawingNotifier extends StateNotifier<DrawingState> {
           ? img.copyWith(saturation: clampedSaturation)
           : img;
     }).toList();
-    
+
     state = state.copyWith(referenceImages: updatedImages);
   }
 
@@ -389,7 +398,7 @@ class DrawingNotifier extends StateNotifier<DrawingState> {
           ? img.copyWith(isFlipped: !currentImage.isFlipped)
           : img;
     }).toList();
-    
+
     state = state.copyWith(referenceImages: updatedImages);
   }
 
@@ -402,7 +411,7 @@ class DrawingNotifier extends StateNotifier<DrawingState> {
           ? img.copyWith(aspectRatioLocked: !currentImage.aspectRatioLocked)
           : img;
     }).toList();
-    
+
     state = state.copyWith(referenceImages: updatedImages);
   }
 
@@ -415,7 +424,7 @@ class DrawingNotifier extends StateNotifier<DrawingState> {
           ? img.copyWith(showGrid: !currentImage.showGrid)
           : img;
     }).toList();
-    
+
     state = state.copyWith(referenceImages: updatedImages);
   }
 
@@ -428,7 +437,7 @@ class DrawingNotifier extends StateNotifier<DrawingState> {
           ? img.copyWith(scale: 0.8, offsetX: 0.0, offsetY: 0.0, rotation: 0.0)
           : img;
     }).toList();
-    
+
     state = state.copyWith(referenceImages: updatedImages);
   }
 }

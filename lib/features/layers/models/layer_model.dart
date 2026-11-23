@@ -1,4 +1,4 @@
-import 'package:flutter/material.dart';
+import 'package:material_ui/material_ui.dart';
 
 class Layer {
   final String id;
@@ -46,7 +46,7 @@ class Layer {
       blendMode: blendMode ?? this.blendMode,
     );
   }
-  
+
   static const String _unspecified = '__unspecified__';
 }
 
