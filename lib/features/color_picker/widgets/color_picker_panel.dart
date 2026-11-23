@@ -36,7 +36,7 @@ class _ColorPickerPanelWidgetState
     return AnimatedPositioned(
       duration: const Duration(milliseconds: 300),
       curve: Curves.easeInOut,
-      left: widget.isOpen ? 0 : -280,
+      right: widget.isOpen ? 0 : -280,
       top: 0,
       bottom: 0,
       width: 280,
