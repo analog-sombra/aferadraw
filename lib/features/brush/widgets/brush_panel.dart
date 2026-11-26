@@ -1,10 +1,8 @@
 import 'package:material_ui/material_ui.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import '../models/brush_model.dart';
 import '../providers/brush_provider.dart';
-import 'brush_preview_painter.dart';
 
-class BrushPanelWidget extends ConsumerStatefulWidget {
+class BrushPanelWidget extends ConsumerWidget {
   final bool isOpen;
   final VoidCallback onClose;
 
@@ -15,44 +13,13 @@ class BrushPanelWidget extends ConsumerStatefulWidget {
   });
 
   @override
-  ConsumerState<BrushPanelWidget> createState() => _BrushPanelWidgetState();
-}
-
-class _BrushPanelWidgetState extends ConsumerState<BrushPanelWidget>
-    with SingleTickerProviderStateMixin {
-  late TabController _tabController;
-
-  @override
-  void initState() {
-    super.initState();
-    _tabController = TabController(length: 8, vsync: this);
-  }
-
-  @override
-  void dispose() {
-    _tabController.dispose();
-    super.dispose();
-  }
-
-  @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context, WidgetRef ref) {
     final currentBrush = ref.watch(brushProvider);
-    final brushesByType = ref.watch(brushesByTypeProvider);
-    final brushTypes = [
-      'sketching',
-      'painting',
-      'ink',
-      'watercolor',
-      'charcoal',
-      'chalk',
-      'airbrush',
-      'texture',
-    ];
 
     return AnimatedPositioned(
       duration: const Duration(milliseconds: 300),
       curve: Curves.easeInOut,
-      right: widget.isOpen ? 0 : -300,
+      right: isOpen ? 0 : -300,
       top: 0,
       bottom: 0,
       width: 300,
@@ -75,7 +42,7 @@ class _BrushPanelWidgetState extends ConsumerState<BrushPanelWidget>
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
                   const Text(
-                    'Brushes',
+                    'Brush Settings',
                     style: TextStyle(
                       color: Colors.white,
                       fontSize: 14,
@@ -88,7 +55,7 @@ class _BrushPanelWidgetState extends ConsumerState<BrushPanelWidget>
                       color: Colors.white,
                       size: 18,
                     ),
-                    onPressed: widget.onClose,
+                    onPressed: onClose,
                     padding: EdgeInsets.zero,
                     constraints: const BoxConstraints(),
                   ),
@@ -96,214 +63,289 @@ class _BrushPanelWidgetState extends ConsumerState<BrushPanelWidget>
               ),
             ),
 
-            // Tabs for brush types
-            TabBar(
-              controller: _tabController,
-              isScrollable: true,
-              labelColor: Colors.blue,
-              unselectedLabelColor: Colors.grey,
-              indicatorColor: Colors.blue,
-              tabs: brushTypes
-                  .map((type) => Tab(
-                        text: type[0].toUpperCase() + type.substring(1),
-                      ))
-                  .toList(),
-            ),
-
-            // Brush list
+            // Controls section
             Expanded(
-              child: TabBarView(
-                controller: _tabController,
-                children: brushTypes.map((type) {
-                  final brushesOfType = brushesByType[type] ?? [];
-                  return ListView.builder(
-                    padding: const EdgeInsets.all(8),
-                    itemCount: brushesOfType.length,
-                    itemBuilder: (context, index) {
-                      final brush = brushesOfType[index];
-                      final isSelected = currentBrush.id == brush.id;
-
-                      return GestureDetector(
-                        onTap: () {
-                          ref.read(brushProvider.notifier).selectBrush(brush);
-                        },
-                        child: Container(
-                          margin: const EdgeInsets.symmetric(vertical: 6),
-                          padding: const EdgeInsets.all(10),
-                          decoration: BoxDecoration(
-                            color: isSelected
-                                ? Colors.blue.withAlpha(100)
-                                : Colors.grey[800],
-                            border: Border.all(
-                              color: isSelected ? Colors.blue : Colors.grey[700]!,
-                              width: 2,
-                            ),
-                            borderRadius: BorderRadius.circular(8),
-                          ),
-                          child: Row(
-                            children: [
-                              // Brush preview
-                              Container(
-                                width: 50,
-                                height: 50,
-                                decoration: BoxDecoration(
-                                  color: Colors.grey[900],
-                                  borderRadius: BorderRadius.circular(4),
-                                  border: Border.all(
-                                    color: Colors.grey[700]!,
-                                    width: 1,
-                                  ),
-                                ),
-                                child: CustomPaint(
-                                  painter: BrushPreviewPainter(brush: brush),
-                                ),
-                              ),
-                              const SizedBox(width: 12),
-
-                              // Brush info
-                              Expanded(
-                                child: Column(
-                                  crossAxisAlignment: CrossAxisAlignment.start,
-                                  children: [
-                                    Text(
-                                      brush.name,
-                                      style: const TextStyle(
-                                        color: Colors.white,
-                                        fontSize: 12,
-                                        fontWeight: FontWeight.w600,
-                                      ),
-                                      maxLines: 1,
-                                      overflow: TextOverflow.ellipsis,
-                                    ),
-                                    const SizedBox(height: 4),
-                                    Row(
-                                      children: [
-                                        Text(
-                                          'Size: ${brush.defaultSize.toStringAsFixed(1)}',
-                                          style: TextStyle(
-                                            color: Colors.grey[500],
-                                            fontSize: 10,
-                                          ),
-                                        ),
-                                        const SizedBox(width: 8),
-                                        Text(
-                                          'Hard: ${(brush.hardness * 100).toStringAsFixed(0)}%',
-                                          style: TextStyle(
-                                            color: Colors.grey[500],
-                                            fontSize: 10,
-                                          ),
-                                        ),
-                                      ],
-                                    ),
-                                  ],
-                                ),
-                              ),
-                            ],
-                          ),
-                        ),
-                      );
-                    },
-                  );
-                }).toList(),
-              ),
-            ),
-
-            // Current brush details
-            Container(
-              padding: const EdgeInsets.all(12),
-              decoration: BoxDecoration(
-                border: Border(
-                  top: BorderSide(
-                    color: Colors.grey[700]!,
-                    width: 1,
-                  ),
-                ),
-              ),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Text(
-                    'Current: ${currentBrush.name}',
-                    style: const TextStyle(
-                      color: Colors.white,
-                      fontSize: 11,
-                      fontWeight: FontWeight.w600,
+              child: SingleChildScrollView(
+                padding: const EdgeInsets.all(16),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    // Brush Options section
+                    const Text(
+                      'Brush Options',
+                      style: TextStyle(
+                        color: Colors.white,
+                        fontSize: 13,
+                        fontWeight: FontWeight.bold,
+                      ),
                     ),
-                  ),
-                  const SizedBox(height: 8),
+                    const SizedBox(height: 12),
 
-                  // Size slider
-                  Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Text(
-                        'Size: ${currentBrush.defaultSize.toStringAsFixed(1)}',
-                        style: TextStyle(
-                          color: Colors.grey[400],
-                          fontSize: 10,
+                    // Size slider
+                    Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Row(
+                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                          children: [
+                            const Text(
+                              'Size',
+                              style: TextStyle(
+                                color: Colors.white,
+                                fontSize: 12,
+                                fontWeight: FontWeight.w600,
+                              ),
+                            ),
+                            Container(
+                              padding: const EdgeInsets.symmetric(
+                                horizontal: 8,
+                                vertical: 4,
+                              ),
+                              decoration: BoxDecoration(
+                                color: Colors.grey[700],
+                                borderRadius: BorderRadius.circular(4),
+                              ),
+                              child: Text(
+                                currentBrush.defaultSize.toStringAsFixed(1),
+                                style: const TextStyle(
+                                  color: Colors.white,
+                                  fontSize: 11,
+                                  fontWeight: FontWeight.w600,
+                                ),
+                              ),
+                            ),
+                          ],
                         ),
-                      ),
-                      Slider(
-                        value: currentBrush.defaultSize,
-                        min: 1,
-                        max: 100,
-                        onChanged: (value) {
-                          ref
-                              .read(brushProvider.notifier)
-                              .updateSize(value);
-                        },
-                      ),
-                    ],
-                  ),
+                        const SizedBox(height: 8),
+                        SliderTheme(
+                          data: SliderThemeData(
+                            trackHeight: 6,
+                            thumbShape: const RoundSliderThumbShape(
+                              enabledThumbRadius: 8,
+                            ),
+                            overlayShape: const RoundSliderOverlayShape(
+                              overlayRadius: 12,
+                            ),
+                          ),
+                          child: Slider(
+                            value: currentBrush.defaultSize,
+                            min: 1,
+                            max: 100,
+                            activeColor: Colors.blue,
+                            inactiveColor: Colors.grey[700],
+                            onChanged: (value) {
+                              ref
+                                  .read(brushProvider.notifier)
+                                  .updateSize(value);
+                            },
+                          ),
+                        ),
+                      ],
+                    ),
 
-                  // Opacity slider
-                  Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Text(
-                        'Opacity: ${(currentBrush.defaultOpacity * 100).toStringAsFixed(0)}%',
-                        style: TextStyle(
-                          color: Colors.grey[400],
-                          fontSize: 10,
-                        ),
-                      ),
-                      Slider(
-                        value: currentBrush.defaultOpacity,
-                        min: 0,
-                        max: 1,
-                        onChanged: (value) {
-                          ref
-                              .read(brushProvider.notifier)
-                              .updateOpacity(value);
-                        },
-                      ),
-                    ],
-                  ),
+                    const SizedBox(height: 16),
 
-                  // Hardness slider
-                  Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Text(
-                        'Hardness: ${(currentBrush.hardness * 100).toStringAsFixed(0)}%',
-                        style: TextStyle(
-                          color: Colors.grey[400],
-                          fontSize: 10,
+                    // Opacity slider
+                    Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Row(
+                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                          children: [
+                            const Text(
+                              'Opacity',
+                              style: TextStyle(
+                                color: Colors.white,
+                                fontSize: 12,
+                                fontWeight: FontWeight.w600,
+                              ),
+                            ),
+                            Container(
+                              padding: const EdgeInsets.symmetric(
+                                horizontal: 8,
+                                vertical: 4,
+                              ),
+                              decoration: BoxDecoration(
+                                color: Colors.grey[700],
+                                borderRadius: BorderRadius.circular(4),
+                              ),
+                              child: Text(
+                                '${(currentBrush.defaultOpacity * 100).toStringAsFixed(0)}%',
+                                style: const TextStyle(
+                                  color: Colors.white,
+                                  fontSize: 11,
+                                  fontWeight: FontWeight.w600,
+                                ),
+                              ),
+                            ),
+                          ],
                         ),
+                        const SizedBox(height: 8),
+                        SliderTheme(
+                          data: SliderThemeData(
+                            trackHeight: 6,
+                            thumbShape: const RoundSliderThumbShape(
+                              enabledThumbRadius: 8,
+                            ),
+                            overlayShape: const RoundSliderOverlayShape(
+                              overlayRadius: 12,
+                            ),
+                          ),
+                          child: Slider(
+                            value: currentBrush.defaultOpacity,
+                            min: 0,
+                            max: 1,
+                            activeColor: Colors.blue,
+                            inactiveColor: Colors.grey[700],
+                            onChanged: (value) {
+                              ref
+                                  .read(brushProvider.notifier)
+                                  .updateOpacity(value);
+                            },
+                          ),
+                        ),
+                      ],
+                    ),
+
+                    const SizedBox(height: 16),
+
+                    // Flow slider
+                    Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Row(
+                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                          children: [
+                            const Text(
+                              'Flow',
+                              style: TextStyle(
+                                color: Colors.white,
+                                fontSize: 12,
+                                fontWeight: FontWeight.w600,
+                              ),
+                            ),
+                            Container(
+                              padding: const EdgeInsets.symmetric(
+                                horizontal: 8,
+                                vertical: 4,
+                              ),
+                              decoration: BoxDecoration(
+                                color: Colors.grey[700],
+                                borderRadius: BorderRadius.circular(4),
+                              ),
+                              child: Text(
+                                '${(currentBrush.flow * 100).toStringAsFixed(0)}%',
+                                style: const TextStyle(
+                                  color: Colors.white,
+                                  fontSize: 11,
+                                  fontWeight: FontWeight.w600,
+                                ),
+                              ),
+                            ),
+                          ],
+                        ),
+                        const SizedBox(height: 8),
+                        SliderTheme(
+                          data: SliderThemeData(
+                            trackHeight: 6,
+                            thumbShape: const RoundSliderThumbShape(
+                              enabledThumbRadius: 8,
+                            ),
+                            overlayShape: const RoundSliderOverlayShape(
+                              overlayRadius: 12,
+                            ),
+                          ),
+                          child: Slider(
+                            value: currentBrush.flow,
+                            min: 0,
+                            max: 1,
+                            activeColor: Colors.blue,
+                            inactiveColor: Colors.grey[700],
+                            onChanged: (value) {
+                              ref
+                                  .read(brushProvider.notifier)
+                                  .updateFlow(value);
+                            },
+                          ),
+                        ),
+                      ],
+                    ),
+
+                    const SizedBox(height: 28),
+
+                    // Stabilizer section
+                    const Text(
+                      'Stabilizer',
+                      style: TextStyle(
+                        color: Colors.white,
+                        fontSize: 13,
+                        fontWeight: FontWeight.bold,
                       ),
-                      Slider(
-                        value: currentBrush.hardness,
-                        min: 0,
-                        max: 1,
-                        onChanged: (value) {
-                          ref
-                              .read(brushProvider.notifier)
-                              .updateHardness(value);
-                        },
-                      ),
-                    ],
-                  ),
-                ],
+                    ),
+                    const SizedBox(height: 12),
+
+                    Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Row(
+                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                          children: [
+                            const Text(
+                              'Amount',
+                              style: TextStyle(
+                                color: Colors.white,
+                                fontSize: 12,
+                                fontWeight: FontWeight.w600,
+                              ),
+                            ),
+                            Container(
+                              padding: const EdgeInsets.symmetric(
+                                horizontal: 8,
+                                vertical: 4,
+                              ),
+                              decoration: BoxDecoration(
+                                color: Colors.grey[700],
+                                borderRadius: BorderRadius.circular(4),
+                              ),
+                              child: Text(
+                                (currentBrush.stabilizer * 100).toStringAsFixed(0),
+                                style: const TextStyle(
+                                  color: Colors.white,
+                                  fontSize: 11,
+                                  fontWeight: FontWeight.w600,
+                                ),
+                              ),
+                            ),
+                          ],
+                        ),
+                        const SizedBox(height: 8),
+                        SliderTheme(
+                          data: SliderThemeData(
+                            trackHeight: 6,
+                            thumbShape: const RoundSliderThumbShape(
+                              enabledThumbRadius: 8,
+                            ),
+                            overlayShape: const RoundSliderOverlayShape(
+                              overlayRadius: 12,
+                            ),
+                          ),
+                          child: Slider(
+                            value: currentBrush.stabilizer,
+                            min: 0,
+                            max: 1,
+                            activeColor: Colors.blue,
+                            inactiveColor: Colors.grey[700],
+                            onChanged: (value) {
+                              ref
+                                  .read(brushProvider.notifier)
+                                  .updateStabilizer(value);
+                            },
+                          ),
+                        ),
+                      ],
+                    ),
+                  ],
+                ),
               ),
             ),
           ],
@@ -312,3 +354,5 @@ class _BrushPanelWidgetState extends ConsumerState<BrushPanelWidget>
     );
   }
 }
+
+

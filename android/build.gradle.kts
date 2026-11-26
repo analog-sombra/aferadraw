@@ -2,6 +2,14 @@ allprojects {
     repositories {
         google()
         mavenCentral()
+        maven {
+            url = uri("https://mirrors.aliyun.com/google")
+            name = "Aliyun Google"
+        }
+        maven {
+            url = uri("https://mirrors.aliyun.com/central")
+            name = "Aliyun Central"
+        }
     }
 }
 

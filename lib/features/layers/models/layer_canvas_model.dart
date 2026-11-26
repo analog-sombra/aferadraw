@@ -7,6 +7,8 @@ class LayerStroke {
   final bool isEraser;
   final Color color;
   final double strokeWidth;
+  final double opacity;
+  final double flow;
 
   LayerStroke({
     required this.id,
@@ -14,6 +16,8 @@ class LayerStroke {
     required this.isEraser,
     this.color = Colors.black,
     this.strokeWidth = 2.0,
+    this.opacity = 1.0,
+    this.flow = 1.0,
   });
 
   LayerStroke copyWith({
@@ -22,6 +26,8 @@ class LayerStroke {
     bool? isEraser,
     Color? color,
     double? strokeWidth,
+    double? opacity,
+    double? flow,
   }) {
     return LayerStroke(
       id: id ?? this.id,
@@ -29,6 +35,8 @@ class LayerStroke {
       isEraser: isEraser ?? this.isEraser,
       color: color ?? this.color,
       strokeWidth: strokeWidth ?? this.strokeWidth,
+      opacity: opacity ?? this.opacity,
+      flow: flow ?? this.flow,
     );
   }
 }

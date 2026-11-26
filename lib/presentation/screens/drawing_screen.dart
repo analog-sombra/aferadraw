@@ -2,7 +2,6 @@ import 'package:material_ui/material_ui.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'dart:io';
 import 'package:image_picker/image_picker.dart';
-import '../../widgets/toolbar_widget.dart';
 import '../../widgets/canvas_widget.dart';
 import '../../features/layers/widgets/layer_panel.dart';
 import '../../features/layers/providers/layer_panel_provider.dart';
@@ -48,7 +47,6 @@ class DrawingScreen extends ConsumerWidget {
             // Main Drawing UI (without layer button in toolbar)
             Column(
               children: [
-                ToolbarWidget(),
                 const CanvasWidget(),
               ],
             ),
@@ -81,7 +79,7 @@ class DrawingScreen extends ConsumerWidget {
             AnimatedPositioned(
               duration: const Duration(milliseconds: 300),
               curve: Curves.easeInOut,
-              right: (isLayerPanelOpen || isBrushPanelOpen) ? 328 : 8,
+              right: (isLayerPanelOpen || isBrushPanelOpen || isColorPickerOpen) ? 328 : 8,
               bottom: 16,
               child: Container(
                 decoration: BoxDecoration(
@@ -107,15 +105,19 @@ class DrawingScreen extends ConsumerWidget {
                     Material(
                       color: Colors.transparent,
                       child: InkWell(
-                        onTap: () {
-                          // TODO: Implement undo
-                        },
+                        onTap: drawingNotifier.canUndo()
+                            ? () {
+                                drawingNotifier.undo();
+                              }
+                            : null,
                         borderRadius: BorderRadius.circular(12),
                         child: Container(
                           width: 48,
                           height: 48,
                           decoration: BoxDecoration(
-                            color: Colors.blue,
+                            color: drawingNotifier.canUndo()
+                                ? Colors.blue
+                                : Colors.grey[600],
                             borderRadius: BorderRadius.circular(12),
                           ),
                           child: const Icon(
@@ -132,15 +134,19 @@ class DrawingScreen extends ConsumerWidget {
                     Material(
                       color: Colors.transparent,
                       child: InkWell(
-                        onTap: () {
-                          // TODO: Implement redo
-                        },
+                        onTap: drawingNotifier.canRedo()
+                            ? () {
+                                drawingNotifier.redo();
+                              }
+                            : null,
                         borderRadius: BorderRadius.circular(12),
                         child: Container(
                           width: 48,
                           height: 48,
                           decoration: BoxDecoration(
-                            color: Colors.cyan,
+                            color: drawingNotifier.canRedo()
+                                ? Colors.cyan
+                                : Colors.grey[600],
                             borderRadius: BorderRadius.circular(12),
                           ),
                           child: const Icon(
@@ -216,7 +222,8 @@ class DrawingScreen extends ConsumerWidget {
                               ? ClipRRect(
                                   borderRadius: BorderRadius.circular(10),
                                   child: Image.file(
-                                    File(drawingProvider.currentRefImage!.imagePath),
+                                    File(drawingProvider
+                                        .currentRefImage!.imagePath),
                                     fit: BoxFit.cover,
                                   ),
                                 )
@@ -243,7 +250,9 @@ class DrawingScreen extends ConsumerWidget {
                           width: 48,
                           height: 48,
                           decoration: BoxDecoration(
-                            color: isInfoPanelOpen ? Colors.indigo : Colors.grey[600],
+                            color: isInfoPanelOpen
+                                ? Colors.indigo
+                                : Colors.grey[600],
                             borderRadius: BorderRadius.circular(12),
                           ),
                           child: const Icon(
@@ -300,7 +309,8 @@ class DrawingScreen extends ConsumerWidget {
                         ),
                         InkWell(
                           onTap: () {
-                            ref.read(infoPanelOpenProvider.notifier).state = false;
+                            ref.read(infoPanelOpenProvider.notifier).state =
+                                false;
                           },
                           child: const Icon(
                             Icons.close,
@@ -318,7 +328,8 @@ class DrawingScreen extends ConsumerWidget {
                       children: [
                         Row(
                           children: [
-                            const Icon(Icons.zoom_in, color: Colors.blue, size: 20),
+                            const Icon(Icons.zoom_in,
+                                color: Colors.blue, size: 20),
                             const SizedBox(width: 8),
                             Text(
                               '${(drawingProvider.scale * 100).toStringAsFixed(0)}%',
@@ -359,7 +370,8 @@ class DrawingScreen extends ConsumerWidget {
                       children: [
                         Row(
                           children: [
-                            const Icon(Icons.rotate_right, color: Colors.green, size: 20),
+                            const Icon(Icons.rotate_right,
+                                color: Colors.green, size: 20),
                             const SizedBox(width: 8),
                             Text(
                               '${(drawingProvider.rotation * 180 / 3.14159).toStringAsFixed(0)}°',
@@ -400,7 +412,8 @@ class DrawingScreen extends ConsumerWidget {
                       children: [
                         Row(
                           children: [
-                            const Icon(Icons.pan_tool, color: Colors.red, size: 20),
+                            const Icon(Icons.pan_tool,
+                                color: Colors.red, size: 20),
                             const SizedBox(width: 8),
                             Column(
                               crossAxisAlignment: CrossAxisAlignment.start,
@@ -482,11 +495,15 @@ class DrawingScreen extends ConsumerWidget {
                       child: InkWell(
                         onTap: () {
                           if (isLayerPanelOpen) {
-                            ref.read(layerPanelOpenProvider.notifier).state = false;
+                            ref.read(layerPanelOpenProvider.notifier).state =
+                                false;
                           } else {
-                            ref.read(layerPanelOpenProvider.notifier).state = true;
-                            ref.read(colorPickerOpenProvider.notifier).state = false;
-                            ref.read(brushPanelOpenProvider.notifier).state = false;
+                            ref.read(layerPanelOpenProvider.notifier).state =
+                                true;
+                            ref.read(colorPickerOpenProvider.notifier).state =
+                                false;
+                            ref.read(brushPanelOpenProvider.notifier).state =
+                                false;
                           }
                         },
                         borderRadius: BorderRadius.circular(12),
@@ -498,7 +515,9 @@ class DrawingScreen extends ConsumerWidget {
                             borderRadius: BorderRadius.circular(12),
                           ),
                           child: Icon(
-                            isLayerPanelOpen ? Icons.layers_clear : Icons.layers,
+                            isLayerPanelOpen
+                                ? Icons.layers_clear
+                                : Icons.layers,
                             color: Colors.white,
                             size: 24,
                           ),
@@ -513,11 +532,15 @@ class DrawingScreen extends ConsumerWidget {
                       child: InkWell(
                         onTap: () {
                           if (isColorPickerOpen) {
-                            ref.read(colorPickerOpenProvider.notifier).state = false;
+                            ref.read(colorPickerOpenProvider.notifier).state =
+                                false;
                           } else {
-                            ref.read(colorPickerOpenProvider.notifier).state = true;
-                            ref.read(layerPanelOpenProvider.notifier).state = false;
-                            ref.read(brushPanelOpenProvider.notifier).state = false;
+                            ref.read(colorPickerOpenProvider.notifier).state =
+                                true;
+                            ref.read(layerPanelOpenProvider.notifier).state =
+                                false;
+                            ref.read(brushPanelOpenProvider.notifier).state =
+                                false;
                           }
                         },
                         borderRadius: BorderRadius.circular(12),
@@ -544,11 +567,15 @@ class DrawingScreen extends ConsumerWidget {
                       child: InkWell(
                         onTap: () {
                           if (isBrushPanelOpen) {
-                            ref.read(brushPanelOpenProvider.notifier).state = false;
+                            ref.read(brushPanelOpenProvider.notifier).state =
+                                false;
                           } else {
-                            ref.read(brushPanelOpenProvider.notifier).state = true;
-                            ref.read(layerPanelOpenProvider.notifier).state = false;
-                            ref.read(colorPickerOpenProvider.notifier).state = false;
+                            ref.read(brushPanelOpenProvider.notifier).state =
+                                true;
+                            ref.read(layerPanelOpenProvider.notifier).state =
+                                false;
+                            ref.read(colorPickerOpenProvider.notifier).state =
+                                false;
                           }
                         },
                         borderRadius: BorderRadius.circular(12),

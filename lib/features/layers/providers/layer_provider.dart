@@ -251,9 +251,7 @@ class LayerStackNotifier extends StateNotifier<LayerStack> {
     if (layerIndex < 0 || layerIndex >= state.layers.length) return;
 
     final layers = [...state.layers];
-    final layer = layers[layerIndex];
-
-    if (layer.parentId == null) return; // Not in a group
+    final layer = layers[layerIndex]; // Not in a group
 
     // Find parent group and remove from children
     int parentIndex = -1;

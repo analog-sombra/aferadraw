@@ -1,6 +1,7 @@
 import 'package:material_ui/material_ui.dart';
 import 'package:vector_math/vector_math_64.dart' as v3;
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'dart:ui' as ui;
 import '../notifiers/enhanced_drawing_notifier.dart';
 import '../features/layers/providers/layer_provider.dart';
 import '../features/layers/models/layer_canvas_model.dart';
@@ -103,114 +104,130 @@ class _CanvasGestureHandlerState extends State<_CanvasGestureHandler> {
         Container(
           color: Colors.transparent,
           padding: const EdgeInsets.all(20),
-          child: GestureDetector(
-            onLongPressStart: (details) {
-              dragStartPosition = details.globalPosition;
-              widget.notifier.startTransforming();
-            },
-            onLongPressMoveUpdate: (details) {
-              if (dragStartPosition != null && !widget.isShowingRef) {
-                final delta = details.globalPosition - dragStartPosition!;
-                widget.notifier.updateMoveOffset(delta.dx, delta.dy);
-                dragStartPosition = details.globalPosition;
-              }
-            },
-            onLongPressEnd: (details) {
-              dragStartPosition = null;
-              widget.notifier.stopTransforming();
-            },
-            onScaleStart: (details) {
-              if (!widget.isShowingRef && details.pointerCount == 1) {
-                if (!_canDraw()) return;
-                widget.notifier.onScaleStart(details.pointerCount);
+          child: Listener(
+            onPointerDown: (event) {
+              if (!widget.isShowingRef && _canDraw()) {
                 final renderBox = widget.canvasKey.currentContext
                     ?.findRenderObject() as RenderBox?;
                 if (renderBox != null) {
-                  final localPos = renderBox.globalToLocal(details.focalPoint);
+                  final localPos = renderBox.globalToLocal(event.position);
                   widget.notifier.startDrawing(
                     widget.layerStack.activeLayer!.id,
                     localPos,
-                    details.pointerCount,
+                    1,
                   );
                 }
-              } else if (details.pointerCount > 1) {
-                widget.notifier.startTransforming();
-                widget.notifier.onScaleStart(details.pointerCount);
               }
             },
-            onScaleUpdate: (details) {
-              if (!widget.isShowingRef) {
-                if (details.pointerCount == 1) {
-                  if (!_canDraw()) return;
-                  final renderBox = widget.canvasKey.currentContext
-                      ?.findRenderObject() as RenderBox?;
-                  if (renderBox != null) {
-                    final localPos =
-                        renderBox.globalToLocal(details.focalPoint);
-                    widget.notifier.draw(
-                      widget.layerStack.activeLayer!.id,
-                      localPos,
-                      details.pointerCount,
-                    );
-                  }
-                } else if (details.pointerCount > 1) {
+            onPointerMove: (event) {
+              if (!widget.isShowingRef && _canDraw()) {
+                final renderBox = widget.canvasKey.currentContext
+                    ?.findRenderObject() as RenderBox?;
+                if (renderBox != null) {
+                  final localPos = renderBox.globalToLocal(event.position);
+                  widget.notifier.draw(
+                    widget.layerStack.activeLayer!.id,
+                    localPos,
+                    1,
+                  );
+                }
+              }
+            },
+            onPointerUp: (event) {
+              widget.notifier.stopDrawing();
+            },
+            child: GestureDetector(
+              onLongPressStart: (details) {
+                dragStartPosition = details.globalPosition;
+                widget.notifier.startTransforming();
+              },
+              onLongPressMoveUpdate: (details) {
+                if (dragStartPosition != null && !widget.isShowingRef) {
+                  final delta = details.globalPosition - dragStartPosition!;
+                  widget.notifier.updateMoveOffset(delta.dx, delta.dy);
+                  dragStartPosition = details.globalPosition;
+                }
+              },
+              onLongPressEnd: (details) {
+                dragStartPosition = null;
+                widget.notifier.stopTransforming();
+              },
+              onScaleStart: (details) {
+                if (details.pointerCount > 1) {
+                  widget.notifier.startTransforming();
+                  widget.notifier.onScaleStart(details.pointerCount);
+                }
+              },
+              onScaleUpdate: (details) {
+                if (!widget.isShowingRef && details.pointerCount > 1) {
                   widget.notifier.startTransforming();
                   widget.notifier.onScaleUpdate(
                       details.scale, details.rotation, details.pointerCount);
                 }
-              }
-            },
-            onScaleEnd: (details) {
-              if (!widget.isShowingRef) {
-                widget.notifier.stopDrawing();
-                widget.notifier.stopTransforming();
-              }
-            },
-            child: Transform(
-              alignment: Alignment.center,
-              transform: Matrix4.identity()
-                ..translateByVector3(v3.Vector3(widget.drawingProvider.offsetX,
-                    widget.drawingProvider.offsetY, 0))
-                ..scaleByVector3(v3.Vector3(widget.drawingProvider.scale,
-                    widget.drawingProvider.scale, 1))
-                ..rotateZ(widget.drawingProvider.rotation),
-              child: ClipRect(
-                child: Container(
-                  key: widget.canvasKey,
-                  decoration: BoxDecoration(
-                    color: Colors.white,
-                    border: Border.all(
-                      color: widget.drawingProvider.isTransforming
-                          ? Colors.red
-                          : Colors.transparent,
-                      width: 3,
+              },
+              onScaleEnd: (details) {
+                if (!widget.isShowingRef) {
+                  widget.notifier.stopTransforming();
+                }
+              },
+              child: Transform(
+                alignment: Alignment.center,
+                transform: Matrix4.identity()
+                  ..translateByVector3(v3.Vector3(widget.drawingProvider.offsetX,
+                      widget.drawingProvider.offsetY, 0))
+                  ..scaleByVector3(v3.Vector3(widget.drawingProvider.scale,
+                      widget.drawingProvider.scale, 1))
+                  ..rotateZ(widget.drawingProvider.rotation),
+                child: ClipRect(
+                  child: Container(
+                    key: widget.canvasKey,
+                    decoration: BoxDecoration(
+                      color: Colors.white,
+                      border: Border.all(
+                        color: widget.drawingProvider.isTransforming
+                            ? Colors.red
+                            : Colors.transparent,
+                        width: 3,
+                      ),
                     ),
-                  ),
-                  child: CustomPaint(
-                    painter: EnhancedDrawingPainter(
-                      layerStrokes: <String, List<LayerStroke>>{
-                        for (final layer in widget.layerStack.layers)
-                          layer.id: widget.drawingProvider.layerCanvasStorage
-                              .getLayerCanvas(layer.id)
-                              .strokes
-                      },
-                      layerOpacities: <String, double>{
-                        for (final layer in widget.layerStack.layers)
-                          layer.id: layer.opacity
-                      },
-                      layerVisibility: <String, bool>{
-                        for (final layer in widget.layerStack.layers)
-                          layer.id: layer.isVisible
-                      },
-                      layerBlendModes: <String, BlendMode>{
-                        for (final layer in widget.layerStack.layers)
-                          layer.id: layer.blendMode
-                      },
-                      layerOrder: <String>[
-                        for (final layer in widget.layerStack.layers) layer.id
-                      ],
+                    child: CustomPaint(
+                      painter: EnhancedDrawingPainter(
+                        layerStrokes: <String, List<LayerStroke>>{
+                          for (final layer in widget.layerStack.layers)
+                            layer.id: widget.drawingProvider.layerCanvasStorage
+                                .getLayerCanvas(layer.id)
+                                .strokes
+                        },
+                        layerOpacities: <String, double>{
+                          for (final layer in widget.layerStack.layers)
+                            layer.id: layer.opacity
+                        },
+                        layerVisibility: <String, bool>{
+                          for (final layer in widget.layerStack.layers)
+                            layer.id: layer.isVisible
+                        },
+                        layerBlendModes: <String, BlendMode>{
+                          for (final layer in widget.layerStack.layers)
+                            layer.id: layer.blendMode
+                        },
+                        layerOrder: <String>[
+                          for (final layer in widget.layerStack.layers) layer.id
+                        ],
+                        layerCachedImages: <String, ui.Image?>{
+                          for (final layer in widget.layerStack.layers)
+                            layer.id: widget.drawingProvider.getCachedLayerImage(layer.id)
+                        },
+                        inProgressLayerId: widget.drawingProvider.layerCanvasStorage
+                                .getLayerCanvas(widget.layerStack.activeLayer?.id ?? '')
+                                .getLastStroke()
+                                ?.id != null ? widget.layerStack.activeLayer?.id : null,
+                        inProgressStrokeId: widget.drawingProvider.layerCanvasStorage
+                            .getLayerCanvas(widget.layerStack.activeLayer?.id ?? '')
+                            .getLastStroke()
+                            ?.id,
+                      ),
+                      size: Size.infinite,
                     ),
-                    size: Size.infinite,
                   ),
                 ),
               ),

@@ -1,5 +1,4 @@
 import 'package:material_ui/material_ui.dart';
-import '../widgets/toolbar_widget.dart';
 import '../widgets/canvas_widget.dart';
 import '../widgets/controls_widget.dart';
 
@@ -12,7 +11,6 @@ class DrawingPage extends StatelessWidget {
       body: SafeArea(
         child: Column(
           children: [
-            const ToolbarWidget(),
             const CanvasWidget(),
             const ControlsWidget(),
           ],
